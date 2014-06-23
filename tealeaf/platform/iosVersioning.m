@@ -48,8 +48,8 @@ CEXPORT int get_platform_memory_limit()
 
 		NSLog(@"{core} Memory used: %d free: %d total: %d", (int)mem_used, (int)mem_free, (int)mem_total);
 
-		// Return 11.11% of total memory (bytes)
-		int limit = mem_total / 9;
+		// Return 20% of total memory (bytes)
+		int limit = mem_total / 5;
 
 		NSLog(@"{core} Texture memory limit set as low as %d", limit);
 
