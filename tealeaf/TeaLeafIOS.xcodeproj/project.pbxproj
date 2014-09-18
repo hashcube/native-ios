@@ -1521,7 +1521,6 @@
 					"$(inherited)",
 					"$(SRCROOT)/deps/spidermonkey",
 					"$(SRCROOT)",
-					"/Users/cat/webe/devkit-priv/addons/native-ios-priv/tealeaf",
 				);
 				LLVM_LTO = NO;
 				ONLY_ACTIVE_ARCH = NO;
