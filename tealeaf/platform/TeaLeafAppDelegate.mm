@@ -90,15 +90,12 @@
 	[self.window makeKeyAndVisible];
 
 	//-- Set Notification
-	if ([[[UIDevice currentDevice] systemVersion] floatValue] >= 8.0)
-	{
+	if ([[[UIDevice currentDevice] systemVersion] floatValue] >= 8.0) {
 		[app registerUserNotificationSettings:
 			[UIUserNotificationSettings settingsForTypes:
 			(UIUserNotificationTypeSound | UIUserNotificationTypeAlert | UIUserNotificationTypeBadge) categories:nil]];
 		[app registerForRemoteNotifications];
-	}
-	else
-	{
+	} else {
 		[app registerForRemoteNotificationTypes:
 			(UIRemoteNotificationTypeBadge | UIRemoteNotificationTypeSound | UIRemoteNotificationTypeAlert)];
 	}
