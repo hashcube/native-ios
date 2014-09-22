@@ -896,8 +896,8 @@ function copyFonts(builder, ttf, destDir) {
 
 function copyIcons(builder, icons, destPath) {
 	if (icons) {
-		['57', '72', '76', '114', '120', '144', '152'].forEach(function(size) {
-			var iOS7 = ['76', '120', '152'].indexOf(size) >= 0;
+		['57', '72', '76', '114', '120', '144', '152', '180'].forEach(function(size) {
+			var iOS7 = ['76', '120', '152', '180'].indexOf(size) >= 0;
 			var mustUnlink = iOS7;
 
 			var targetPath = path.join(destPath, 'tealeaf/Images.xcassets/AppIcon.appiconset', 'icon' + size + '.png');
@@ -940,6 +940,8 @@ function copySplash(builder, manifest, destPath, next) {
 			{ key: "portrait960", outFile: "Default@2x.png", outSize: "640x960"},
 			{ key: "portrait1024", outFile: "Default-Portrait~ipad.png", outSize: "768x1024"},
 			{ key: "portrait1136", outFile: "Default-568h@2x.png", outSize: "640x1136"},
+			{ key: "portrait1334", outFile: "Default-667h@2x.png", outSize: "750x1334"},
+			{ key: "portrait2208", outFile: "Default-736h@3x.png", outSize: "1242x2208"},
 			{ key: "portrait2048", outFile: "Default-Portrait@2x~ipad.png", outSize: "1536x2048"},
 			{ key: "landscape768", outFile: "Default-Landscape~ipad.png", outSize: "1024x768"},
 			{ key: "landscape1536", outFile: "Default-Landscape@2x~ipad.png", outSize: "2048x1536"}
