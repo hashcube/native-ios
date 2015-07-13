@@ -333,7 +333,7 @@
 	[self.canvas startRendering];
 
 	[self postPauseEvent:self.wasPaused];
-
+	[self.pluginManager applicationDidBecomeActive:application];
 	LOG("{focus} Gained focus");
 }
 
