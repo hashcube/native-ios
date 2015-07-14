@@ -90,8 +90,16 @@
 	self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
 	[self.window makeKeyAndVisible];
 
-	[app registerForRemoteNotificationTypes:
-	 (UIRemoteNotificationTypeBadge | UIRemoteNotificationTypeSound | UIRemoteNotificationTypeAlert)];
+	//-- Set Notification
+	if ([[[UIDevice currentDevice] systemVersion] floatValue] >= 8.0) {
+		[app registerUserNotificationSettings:
+			[UIUserNotificationSettings settingsForTypes:
+			(UIUserNotificationTypeSound | UIUserNotificationTypeAlert | UIUserNotificationTypeBadge) categories:nil]];
+		[app registerForRemoteNotifications];
+	} else {
+		[app registerForRemoteNotificationTypes:
+			(UIRemoteNotificationTypeBadge | UIRemoteNotificationTypeSound | UIRemoteNotificationTypeAlert)];
+	}
 
 	//TEALEAF_SPECIFIC_START
 	self.tealeafViewController = [[TeaLeafViewController alloc] init];
@@ -134,6 +142,7 @@
 
 	return YES;
 }
+
 
 - (void) restartJS {
 	if (!self.isTestApp) {
@@ -440,6 +449,8 @@
 
 - (void) application: (UIApplication *) app didRegisterForRemoteNotificationsWithDeviceToken: (NSData *) deviceToken
 {
+	NSLOG(@"{notifications} Push notification registration successful: %@", deviceToken);
+
 	[self.pluginManager didRegisterForRemoteNotificationsWithDeviceToken:deviceToken application:app];
 }
 
@@ -451,8 +462,12 @@
 }
 
 - (void) application: (UIApplication *) app didReceiveRemoteNotification:(NSDictionary *)userInfo
+	fetchCompletionHandler:(void (^)(UIBackgroundFetchResult result))handler
 {
 	[self.pluginManager didReceiveRemoteNotification:userInfo application:app];
+	if (handler) {
+		handler(UIBackgroundFetchResultNoData);
+	}
 }
 
 - (void)application:(UIApplication *)app didReceiveLocalNotification:(UILocalNotification *)notification
