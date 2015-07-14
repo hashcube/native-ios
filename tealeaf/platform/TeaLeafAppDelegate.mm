@@ -90,8 +90,8 @@
 	self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
 	[self.window makeKeyAndVisible];
 
-    [app registerForRemoteNotificationTypes:
-     (UIRemoteNotificationTypeBadge | UIRemoteNotificationTypeSound | UIRemoteNotificationTypeAlert)];
+	[app registerForRemoteNotificationTypes:
+	 (UIRemoteNotificationTypeBadge | UIRemoteNotificationTypeSound | UIRemoteNotificationTypeAlert)];
 
 	//TEALEAF_SPECIFIC_START
 	self.tealeafViewController = [[TeaLeafViewController alloc] init];
@@ -239,17 +239,17 @@
 
 - (void) postPauseEvent:(BOOL) isPaused {
   if (js_ready) {
-    NSString* evt = isPaused ? @"{\"name\":\"pause\"}" : @"{\"name\":\"resume\"}";
-    core_dispatch_event([evt UTF8String]);
-    LOG("postPauseEvent");
+	NSString* evt = isPaused ? @"{\"name\":\"pause\"}" : @"{\"name\":\"resume\"}";
+	core_dispatch_event([evt UTF8String]);
+	LOG("postPauseEvent");
 
-    if (self.pluginManager) {
-      if (isPaused) {
-        [self.pluginManager onPause];
-      } else {
-        [self.pluginManager onResume];
-      }
-    }
+	if (self.pluginManager) {
+	  if (isPaused) {
+		[self.pluginManager onPause];
+	  } else {
+		[self.pluginManager onResume];
+	  }
+	}
   }
 }
 
@@ -440,7 +440,7 @@
 
 - (void) application: (UIApplication *) app didRegisterForRemoteNotificationsWithDeviceToken: (NSData *) deviceToken
 {
-    [self.pluginManager didRegisterForRemoteNotificationsWithDeviceToken:deviceToken application:app];
+	[self.pluginManager didRegisterForRemoteNotificationsWithDeviceToken:deviceToken application:app];
 }
 
 - (void) application: (UIApplication *) app didFailToRegisterForRemoteNotificationsWithError: (NSError *) error
