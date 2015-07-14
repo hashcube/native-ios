@@ -462,8 +462,12 @@
 }
 
 - (void) application: (UIApplication *) app didReceiveRemoteNotification:(NSDictionary *)userInfo
+	fetchCompletionHandler:(void (^)(UIBackgroundFetchResult result))handler
 {
 	[self.pluginManager didReceiveRemoteNotification:userInfo application:app];
+	if (handler) {
+		handler(UIBackgroundFetchResultNoData);
+	}
 }
 
 - (void)application:(UIApplication *)app didReceiveLocalNotification:(UILocalNotification *)notification
