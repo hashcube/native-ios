@@ -247,19 +247,19 @@
 }
 
 - (void) postPauseEvent:(BOOL) isPaused {
-  if (js_ready) {
-	NSString* evt = isPaused ? @"{\"name\":\"pause\"}" : @"{\"name\":\"resume\"}";
-	core_dispatch_event([evt UTF8String]);
-	LOG("postPauseEvent");
+    if (js_ready) {
+        NSString* evt = isPaused ? @"{\"name\":\"pause\"}" : @"{\"name\":\"resume\"}";
+        core_dispatch_event([evt UTF8String]);
+        LOG("postPauseEvent");
 
-	if (self.pluginManager) {
-		if (isPaused) {
-			[self.pluginManager onPause];
-	 	} else {
-			[self.pluginManager onResume];
-	 	}
-	}
-  }
+        if (self.pluginManager) {
+            if (isPaused) {
+                [self.pluginManager onPause];
+            } else {
+                [self.pluginManager onResume];
+            }
+        }
+    }
 }
 
 - (void)applicationWillEnterForeground:(UIApplication *)application
