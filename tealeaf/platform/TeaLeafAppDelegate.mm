@@ -10,7 +10,7 @@
  * Mozilla Public License v. 2.0 for more details.
 
  * You should have received a copy of the Mozilla Public License v. 2.0
- * along with the Game Closure SDK.	 If not, see <http://mozilla.org/MPL/2.0/>.
+ * along with the Game Closure SDK.	If not, see <http://mozilla.org/MPL/2.0/>.
  */
 
 #import "TeaLeafAppDelegate.h"
@@ -247,19 +247,19 @@
 }
 
 - (void) postPauseEvent:(BOOL) isPaused {
-  if (js_ready) {
-    NSString* evt = isPaused ? @"{\"name\":\"pause\"}" : @"{\"name\":\"resume\"}";
-    core_dispatch_event([evt UTF8String]);
-    LOG("postPauseEvent");
+    if (js_ready) {
+        NSString* evt = isPaused ? @"{\"name\":\"pause\"}" : @"{\"name\":\"resume\"}";
+        core_dispatch_event([evt UTF8String]);
+        LOG("postPauseEvent");
 
-    if (self.pluginManager) {
-      if (isPaused) {
-        [self.pluginManager onPause];
-      } else {
-        [self.pluginManager onResume];
-      }
+        if (self.pluginManager) {
+            if (isPaused) {
+                [self.pluginManager onPause];
+            } else {
+                [self.pluginManager onResume];
+            }
+        }
     }
-  }
 }
 
 - (void)applicationWillEnterForeground:(UIApplication *)application
@@ -342,7 +342,7 @@
 	[self.canvas startRendering];
 
 	[self postPauseEvent:self.wasPaused];
-
+	[self.pluginManager applicationDidBecomeActive:application];
 	LOG("{focus} Gained focus");
 }
 
@@ -377,7 +377,7 @@
 
 // Sent if browsing fails
 - (void)netServiceBrowser:(NSNetServiceBrowser *)browser
-			 didNotSearch:(NSDictionary *)errorDict
+			didNotSearch:(NSDictionary *)errorDict
 {
    NSLOG(@"netServiceBrowser didNotSearch %@", [errorDict objectForKey:NSNetServicesErrorCode]);
 
@@ -393,8 +393,8 @@
 
 // Sent when a service appears
 - (void)netServiceBrowser:(NSNetServiceBrowser *)browser
-		   didFindService:(NSNetService *)aNetService
-			   moreComing:(BOOL)moreComing
+		  didFindService:(NSNetService *)aNetService
+			  moreComing:(BOOL)moreComing
 {
 
 	[self.services addObject:aNetService];
@@ -405,8 +405,8 @@
 
 // Sent when a service disappears
 - (void)netServiceBrowser:(NSNetServiceBrowser *)browser
-		 didRemoveService:(NSNetService *)aNetService
-			   moreComing:(BOOL)moreComing
+		didRemoveService:(NSNetService *)aNetService
+			  moreComing:(BOOL)moreComing
 {
 	[self.services removeObject:aNetService];
 }
@@ -424,7 +424,7 @@
 - (BOOL)application:(UIApplication *)application
 			openURL:(NSURL *)url
   sourceApplication:(NSString *)sourceApplication
-		 annotation:(id)annotation
+		annotation:(id)annotation
 {
 	if (self.pluginManager) {
 		[self.pluginManager handleOpenURL:url  sourceApplication:sourceApplication];
@@ -491,8 +491,8 @@
 	}
 
 	bool portraitMode = (orientation == UIDeviceOrientationFaceUp ||
-						 orientation == UIDeviceOrientationPortrait ||
-						 orientation == UIDeviceOrientationPortraitUpsideDown);
+						orientation == UIDeviceOrientationPortrait ||
+						orientation == UIDeviceOrientationPortraitUpsideDown);
 
 	if (!self.gameSupportsPortrait) {
 		self.screenPortraitMode = NO;
