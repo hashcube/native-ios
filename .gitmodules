@@ -1,6 +1,6 @@
 [submodule "tealeaf/native-core"]
 	path = tealeaf/native-core
-	url = https://github.com/gameclosure/native-core.git
+	url = git@bitbucket.org:hashcube/native-core.git
 [submodule "tealeaf/deps/jansson"]
 	path = tealeaf/deps/jansson
 	url = https://github.com/gameclosure/jansson.git
