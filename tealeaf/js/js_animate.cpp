@@ -295,7 +295,6 @@ void def_animate_remove_from_group(JS_OBJECT_WRAPPER a) {
     }
   }
   LOGFN("end def_animate_remove_from_group");
->>>>>>> github/master
 }
 
 void def_animate_cb(JS_OBJECT_WRAPPER view, JS_OBJECT_WRAPPER cb, double tt, double t) {
