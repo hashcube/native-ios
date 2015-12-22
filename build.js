@@ -140,6 +140,8 @@ function updateInfoPlist(app, config, plist) {
   raw.CFBundleDisplayName = app.manifest.title || "";
   raw.CFBundleIdentifier = config.bundleID;
   raw.CFBundleName = config.bundleID;
+  raw.UIRequiresFullScreen = app.manifest.requireFullScreen;
+  raw.UIBackgroundModes = app.manifest.requiredBackgroundModes;
 
   // For each URLTypes array entry,
   var found = 0;
