@@ -474,6 +474,13 @@
 	[self.pluginManager didReceiveLocalNotification:notification application:app];
 }
 
+- (void) application: (UIApplication *) application performActionForShortcutItem:(UIApplicationShortcutItem *)shortcutItem completionHandler:(void (^)(BOOL succeeded))completionHandler
+{
+    [self.pluginManager performActionForShortcutItem:shortcutItem.type];
+    if (completionHandler) {
+		completionHandler(true);
+	}
+}
 
 //// Splash Screen
 
