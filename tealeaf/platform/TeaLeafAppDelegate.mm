@@ -478,7 +478,7 @@
 {
     [self.pluginManager performActionForShortcutItem:shortcutItem.type];
     if (completionHandler) {
-		completionHandler(true);
+		completionHandler(YES);
 	}
 }
 
