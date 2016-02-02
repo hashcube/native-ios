@@ -476,7 +476,7 @@
 
 - (void) application: (UIApplication *) application performActionForShortcutItem:(UIApplicationShortcutItem *)shortcutItem completionHandler:(void (^)(BOOL succeeded))completionHandler
 {
-    [self.pluginManager performActionForShortcutItem:shortcutItem.type];
+    [self.pluginManager performActionForShortcutItem:shortcutItem];
     if (completionHandler) {
 		completionHandler(YES);
 	}
