@@ -25,82 +25,81 @@ CEXPORT {
 
 static inline void build_style_frame(anim_frame *frame, JSObject *target) {
 
-#define ADD_PROP(const_name, prop)								\
-  _ADD_PROP(const_name, prop, false);							\
-  _ADD_PROP(const_name, d ## prop, true);
+	#define ADD_PROP(const_name, prop)								\
+		_ADD_PROP(const_name, prop, false);							\
+		_ADD_PROP(const_name, d ## prop, true);
 
-#define _ADD_PROP(const_name, prop, _is_delta) do {				\
-  JS::RootedValue value(cx);												\
-  JS_GetProperty(cx, target, #prop, &value);					\
-  double prop_val;											\
-  JS::ToNumber(cx, value, &prop_val);						\
-  if (!isnan(prop_val)) {										\
-    style_prop *p = anim_frame_add_style_prop(frame);		\
-    p->name = const_name;									\
-    p->is_delta = _is_delta;								\
-    p->target = prop_val;									\
-  }															\
-} while(0)
-JSContext *cx = get_js_context();
-ADD_PROP(X, x);
-ADD_PROP(Y, y);
-ADD_PROP(WIDTH, width);
-ADD_PROP(HEIGHT, height);
-ADD_PROP(R, r);
-ADD_PROP(ANCHOR_X, anchorX);
-ADD_PROP(ANCHOR_Y, anchorY);
-ADD_PROP(OPACITY, opacity);
-ADD_PROP(SCALE, scale);
-ADD_PROP(SCALE_X, scaleX);
-ADD_PROP(SCALE_Y, scaleY);
+	#define _ADD_PROP(const_name, prop, _is_delta) do {				\
+		JS::RootedValue value(cx);												\
+		JS_GetProperty(cx, target, #prop, &value);					\
+		double prop_val;											\
+		JS::ToNumber(cx, value, &prop_val);						\
+		if (!isnan(prop_val)) {										\
+			style_prop *p = anim_frame_add_style_prop(frame);		\
+			p->name = const_name;									\
+			p->is_delta = _is_delta;								\
+			p->target = prop_val;									\
+		}															\
+	} while(0)
+	JSContext *cx = get_js_context();
+	ADD_PROP(X, x);
+	ADD_PROP(Y, y);
+	ADD_PROP(WIDTH, width);
+	ADD_PROP(HEIGHT, height);
+	ADD_PROP(R, r);
+	ADD_PROP(ANCHOR_X, anchorX);
+	ADD_PROP(ANCHOR_Y, anchorY);
+	ADD_PROP(OPACITY, opacity);
+	ADD_PROP(SCALE, scale);
+	ADD_PROP(SCALE_X, scaleX);
+	ADD_PROP(SCALE_Y, scaleY);
 
-frame->type = STYLE_FRAME;
+	frame->type = STYLE_FRAME;
 }
 
 static inline void build_func_frame(anim_frame *frame, JS::HandleObject cb) {
-  js_object_wrapper_root(&frame->cb, cb.get());
-  frame->type = FUNC_FRAME;
+	js_object_wrapper_root(&frame->cb, cb.get());
+	frame->type = FUNC_FRAME;
 }
 
 typedef void
 (* NextAnimationFrame)(view_animation*, anim_frame*, unsigned, unsigned);
 
 static inline void build_frame(JSContext *cx, JS::HandleObject target, unsigned argc, jsval *vp, NextAnimationFrame next) {
-  LOGFN("build_frame");
+	LOGFN("build_frame");
 
   JSAutoRequest areq(cx);
   JS::CallArgs args = JS::CallArgsFromVp(argc, vp);
   JS::RootedObject thiz(cx, JSVAL_TO_OBJECT(args.thisv()));
 
-  view_animation *anim = (view_animation*)JS_GetPrivate(thiz);
-  anim_frame *frame = anim_frame_get();
+	view_animation *anim = (view_animation*)JS_GetPrivate(thiz);
+	anim_frame *frame = anim_frame_get();
 
-  // TODO: what if these defaults change? it probably won't...
-  int32_t duration = 500;
-  int32_t transition = 0;
+	// TODO: what if these defaults change? it probably won't...
+	int32_t duration = 500;
+	int32_t transition = 0;
 
-  if (JS_ObjectIsFunction(cx, target)) {
-    duration = 0;
-    build_func_frame(frame, target);
-  } else {
-    build_style_frame(frame, target);
-  }
+	if (JS_ObjectIsFunction(cx, target)) {
+		duration = 0;
+		build_func_frame(frame, target);
+	} else {
+		build_style_frame(frame, target);
+	}
 
-  if (argc > 1) {
+	if (argc > 1) {
     if(!JS::ToInt32(cx, args[1], &duration)) {
       duration = 500;
     }
-    if (argc > 2) {
+		if (argc > 2) {
       if(!JS::ToInt32(cx, args[2], &transition)) {
         transition = 0;
       }
-    }
-  }
+		}
+	}
 
+	next(anim, frame, duration, transition);
 
-  next(anim, frame, duration, transition);
-
-  LOGFN("end build_frame");
+	LOGFN("end build_frame");
 }
 
 
@@ -110,16 +109,16 @@ CEXPORT bool def_animate_now(JSContext *cx, unsigned argc, jsval *vp) {
   JS::CallArgs args = JS::CallArgsFromVp(argc, vp);
   JS::RootedObject thiz(cx, JSVAL_TO_OBJECT(args.thisv()));
 
-  if (!JSVAL_IS_PRIMITIVE(args[0])) {
+	if (!JSVAL_IS_PRIMITIVE(args[0])) {
     JS::RootedObject target(cx, JSVAL_TO_OBJECT(args[0]));
 
-    if (target) {
-      build_frame(cx, target, argc, vp, view_animation_now);
-    }
-  }
+		if (target) {
+			build_frame(cx, target, argc, vp, view_animation_now);
+		}
+	}
 
   args.rval().set(OBJECT_TO_JSVAL(thiz));
-  return true;
+	return true;
 }
 
 CEXPORT bool def_animate_then(JSContext *cx, unsigned argc, jsval *vp) {
@@ -127,15 +126,15 @@ CEXPORT bool def_animate_then(JSContext *cx, unsigned argc, jsval *vp) {
   JS::CallArgs args = JS::CallArgsFromVp(argc, vp);
   JS::RootedObject thiz(cx, JSVAL_TO_OBJECT(args.thisv()));
 
-  if (!JSVAL_IS_PRIMITIVE(args[0])) {
+	if (!JSVAL_IS_PRIMITIVE(args[0])) {
     JS::RootedObject target(cx, JSVAL_TO_OBJECT(args[0]));
-    if (target) {
-      build_frame(cx, target, argc, vp, view_animation_then);
-    }
-  }
+		if (target) {
+			build_frame(cx, target, argc, vp, view_animation_then);
+		}
+	}
 
   args.rval().set(OBJECT_TO_JSVAL(thiz));
-  return true;
+	return true;
 }
 
 CEXPORT bool def_animate_commit(JSContext *cx, unsigned argc, jsval *vp) {
@@ -143,11 +142,11 @@ CEXPORT bool def_animate_commit(JSContext *cx, unsigned argc, jsval *vp) {
   JS::CallArgs args = JS::CallArgsFromVp(argc, vp);
   JS::RootedObject thiz(cx, JSVAL_TO_OBJECT(args.thisv()));
 
-  view_animation *anim = (view_animation *)JS_GetPrivate(thiz);
-  view_animation_commit(anim);
+	view_animation *anim = (view_animation *)JS_GetPrivate(thiz);
+	view_animation_commit(anim);
 
   args.rval().set(OBJECT_TO_JSVAL(thiz));
-  return true;
+	return true;
 }
 
 CEXPORT bool def_animate_clear(JSContext *cx, unsigned argc, jsval *vp) {
@@ -155,15 +154,15 @@ CEXPORT bool def_animate_clear(JSContext *cx, unsigned argc, jsval *vp) {
   JS::CallArgs args = JS::CallArgsFromVp(argc, vp);
   JS::RootedObject thiz(cx, JSVAL_TO_OBJECT(args.thisv()));
 
-  view_animation *anim = (view_animation *)JS_GetPrivate(thiz);
-  view_animation_clear(anim);
+	view_animation *anim = (view_animation *)JS_GetPrivate(thiz);
+	view_animation_clear(anim);
 
   args.rval().set(OBJECT_TO_JSVAL(thiz));
-  return true;
+	return true;
 }
 
 CEXPORT bool def_animate_wait(JSContext *cx, unsigned argc, jsval *vp) {
-  JSAutoRequest areq(cx);
+	JSAutoRequest areq(cx);
   JS::CallArgs args = JS::CallArgsFromVp(argc, vp);
 
   JS::RootedObject thiz(cx, JSVAL_TO_OBJECT(args.thisv()));
@@ -181,44 +180,44 @@ CEXPORT bool def_animate_pause(JSContext *cx, unsigned argc, jsval *vp) {
   JS::CallArgs args = JS::CallArgsFromVp(argc, vp);
   JS::RootedObject thiz(cx, JSVAL_TO_OBJECT(args.thisv()));
 
-  view_animation *anim = (view_animation *)JS_GetPrivate(thiz);
-  view_animation_pause(anim);
+	view_animation *anim = (view_animation *)JS_GetPrivate(thiz);
+	view_animation_pause(anim);
 
   args.rval().set(args.thisv());
-  return true;
+	return true;
 }
 
 CEXPORT bool def_animate_resume(JSContext *cx, unsigned argc, jsval *vp) {
   JSAutoRequest areq(cx);
   JS::CallArgs args = JS::CallArgsFromVp(argc, vp);
   JS::RootedObject thiz(cx, JSVAL_TO_OBJECT(args.thisv()));
-  view_animation *anim = (view_animation *)JS_GetPrivate(thiz);
+	view_animation *anim = (view_animation *)JS_GetPrivate(thiz);
 
-  view_animation_resume(anim);
+	view_animation_resume(anim);
 
   args.rval().set(args.thisv());
-  return true;
+	return true;
 }
 
 CEXPORT bool def_animate_isPaused(JSContext *cx, unsigned argc, jsval *vp) {
-  JSAutoRequest areq(cx);
+	JSAutoRequest areq(cx);
   JS::CallArgs args = JS::CallArgsFromVp(argc, vp);
   JS::RootedObject thiz(cx, JSVAL_TO_OBJECT(args.thisv()));
 
-  view_animation *anim = (view_animation *)JS_GetPrivate(thiz);
+	view_animation *anim = (view_animation *)JS_GetPrivate(thiz);
 
   args.rval().setBoolean(anim->is_paused);
-  return true;
+	return true;
 }
 
 CEXPORT bool def_animate_hasFrames(JSContext *cx, unsigned argc, jsval *vp) {
   JSAutoRequest areq(cx);
   JS::CallArgs args = JS::CallArgsFromVp(argc, vp);
   JS::RootedObject thiz(cx, JSVAL_TO_OBJECT(args.thisv()));
-  view_animation *anim = (view_animation *)JS_GetPrivate(thiz);
+	view_animation *anim = (view_animation *)JS_GetPrivate(thiz);
 
   args.rval().setBoolean((bool)anim->frame_head);
-  return true;
+	return true;
 }
 
 
@@ -235,17 +234,16 @@ CEXPORT bool def_animate_class_constructor(JSContext *cx, unsigned argc, jsval *
   JS::CallArgs args = JS::CallArgsFromVp(argc, vp);
 
   JS::RootedObject thiz(cx, animate_create_ctor_object(cx, vp));
-  if (!thiz) {
-    return false;
-  }
-
+	if (!thiz) {
+		return false;
+	}
 
   if (unlikely(argc < 1 || JSVAL_IS_PRIMITIVE(args[0]))) {
     LOG("{animate} ERROR: Animate constructor arguments were invalid!");
-
-    return false;
-  } else {
+		return false;
+	} else {
     JS::RootedObject js_timestep_view(cx, JSVAL_TO_OBJECT(args[0]));
+
     JS::RootedValue __view(cx);
 
     JS_GetProperty(cx, js_timestep_view, "__view", &__view);
@@ -259,8 +257,8 @@ CEXPORT bool def_animate_class_constructor(JSContext *cx, unsigned argc, jsval *
 
     args.rval().set(OBJECT_TO_JSVAL(thiz));
 
-    return true;
-  }
+		return true;
+	}
 }
 
 void def_animate_add_to_group(JS_OBJECT_WRAPPER a) {
@@ -273,7 +271,7 @@ void def_animate_add_to_group(JS_OBJECT_WRAPPER a) {
   if (finish_val.isObject()) {
     JS::RootedObject finish(cx, finish_val.toObjectOrNull());
     JS::Value args[] = {OBJECT_TO_JSVAL(js_anim)};
-    if (JS_ObjectIsFunction(cx, finish)) {
+		if (JS_ObjectIsFunction(cx, finish)) {
       JS::RootedValue ret(cx);
       JS_CallFunctionValue(cx, js_anim, finish_val, 1, args, ret.address());
     }

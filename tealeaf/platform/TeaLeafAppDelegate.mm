@@ -10,7 +10,7 @@
  * Mozilla Public License v. 2.0 for more details.
 
  * You should have received a copy of the Mozilla Public License v. 2.0
- * along with the Game Closure SDK.	 If not, see <http://mozilla.org/MPL/2.0/>.
+ * along with the Game Closure SDK.	If not, see <http://mozilla.org/MPL/2.0/>.
  */
 
 #import "TeaLeafAppDelegate.h"
@@ -88,6 +88,17 @@
 
 	self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
 	[self.window makeKeyAndVisible];
+
+	//-- Set Notification
+	if ([[[UIDevice currentDevice] systemVersion] floatValue] >= 8.0) {
+		[app registerUserNotificationSettings:
+			[UIUserNotificationSettings settingsForTypes:
+			(UIUserNotificationTypeSound | UIUserNotificationTypeAlert | UIUserNotificationTypeBadge) categories:nil]];
+		[app registerForRemoteNotifications];
+	} else {
+		[app registerForRemoteNotificationTypes:
+			(UIRemoteNotificationTypeBadge | UIRemoteNotificationTypeSound | UIRemoteNotificationTypeAlert)];
+	}
 
 	//TEALEAF_SPECIFIC_START
 	self.tealeafViewController = [[TeaLeafViewController alloc] init];
@@ -235,19 +246,19 @@
 }
 
 - (void) postPauseEvent:(BOOL) isPaused {
-  if (js_ready) {
-    NSString* evt = isPaused ? @"{\"name\":\"pause\"}" : @"{\"name\":\"resume\"}";
-    core_dispatch_event([evt UTF8String]);
-    LOG("postPauseEvent");
+    if (js_ready) {
+        NSString* evt = isPaused ? @"{\"name\":\"pause\"}" : @"{\"name\":\"resume\"}";
+        core_dispatch_event([evt UTF8String]);
+        LOG("postPauseEvent");
 
-    if (self.pluginManager) {
-      if (isPaused) {
-        [self.pluginManager onPause];
-      } else {
-        [self.pluginManager onResume];
-      }
+        if (self.pluginManager) {
+            if (isPaused) {
+                [self.pluginManager onPause];
+            } else {
+                [self.pluginManager onResume];
+            }
+        }
     }
-  }
 }
 
 - (void)applicationWillEnterForeground:(UIApplication *)application
@@ -330,7 +341,7 @@
 	[self.canvas startRendering];
 
 	[self postPauseEvent:self.wasPaused];
-
+	[self.pluginManager applicationDidBecomeActive:application];
 	LOG("{focus} Gained focus");
 }
 
@@ -365,7 +376,7 @@
 
 // Sent if browsing fails
 - (void)netServiceBrowser:(NSNetServiceBrowser *)browser
-			 didNotSearch:(NSDictionary *)errorDict
+			didNotSearch:(NSDictionary *)errorDict
 {
    NSLOG(@"netServiceBrowser didNotSearch %@", [errorDict objectForKey:NSNetServicesErrorCode]);
 
@@ -381,8 +392,8 @@
 
 // Sent when a service appears
 - (void)netServiceBrowser:(NSNetServiceBrowser *)browser
-		   didFindService:(NSNetService *)aNetService
-			   moreComing:(BOOL)moreComing
+		  didFindService:(NSNetService *)aNetService
+			  moreComing:(BOOL)moreComing
 {
 
 	[self.services addObject:aNetService];
@@ -393,8 +404,8 @@
 
 // Sent when a service disappears
 - (void)netServiceBrowser:(NSNetServiceBrowser *)browser
-		 didRemoveService:(NSNetService *)aNetService
-			   moreComing:(BOOL)moreComing
+		didRemoveService:(NSNetService *)aNetService
+			  moreComing:(BOOL)moreComing
 {
 	[self.services removeObject:aNetService];
 }
@@ -412,7 +423,7 @@
 - (BOOL)application:(UIApplication *)application
 			openURL:(NSURL *)url
   sourceApplication:(NSString *)sourceApplication
-		 annotation:(id)annotation
+		annotation:(id)annotation
 {
 	if (self.pluginManager) {
 		[self.pluginManager handleOpenURL:url  sourceApplication:sourceApplication];
@@ -437,7 +448,9 @@
 
 - (void) application: (UIApplication *) app didRegisterForRemoteNotificationsWithDeviceToken: (NSData *) deviceToken
 {
-    [self.pluginManager didRegisterForRemoteNotificationsWithDeviceToken:deviceToken application:app];
+	NSLOG(@"{notifications} Push notification registration successful: %@", deviceToken);
+
+	[self.pluginManager didRegisterForRemoteNotificationsWithDeviceToken:deviceToken application:app];
 }
 
 - (void) application: (UIApplication *) app didFailToRegisterForRemoteNotificationsWithError: (NSError *) error
@@ -448,8 +461,12 @@
 }
 
 - (void) application: (UIApplication *) app didReceiveRemoteNotification:(NSDictionary *)userInfo
+	fetchCompletionHandler:(void (^)(UIBackgroundFetchResult result))handler
 {
 	[self.pluginManager didReceiveRemoteNotification:userInfo application:app];
+	if (handler) {
+		handler(UIBackgroundFetchResultNoData);
+	}
 }
 
 - (void)application:(UIApplication *)app didReceiveLocalNotification:(UILocalNotification *)notification
@@ -457,6 +474,13 @@
 	[self.pluginManager didReceiveLocalNotification:notification application:app];
 }
 
+- (void) application: (UIApplication *) application performActionForShortcutItem:(UIApplicationShortcutItem *)shortcutItem completionHandler:(void (^)(BOOL succeeded))completionHandler
+{
+	[self.pluginManager performActionForShortcutItem:shortcutItem];
+	if (completionHandler) {
+		completionHandler(YES);
+	}
+}
 
 //// Splash Screen
 
@@ -473,8 +497,8 @@
 	}
 
 	bool portraitMode = (orientation == UIDeviceOrientationFaceUp ||
-						 orientation == UIDeviceOrientationPortrait ||
-						 orientation == UIDeviceOrientationPortraitUpsideDown);
+						orientation == UIDeviceOrientationPortrait ||
+						orientation == UIDeviceOrientationPortraitUpsideDown);
 
 	if (!self.gameSupportsPortrait) {
 		self.screenPortraitMode = NO;
