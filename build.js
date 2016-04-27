@@ -126,8 +126,10 @@ function updateInfoPlist(app, config, plist) {
   var version = (manifest.ios && manifest.ios.version) ||
       manifest.version ||
       '0.0.0';
+  var versionCode = (manifest.ios && manifest.ios.versionCode) || version;
+
   raw.CFBundleShortVersionString = version;
-  raw.CFBundleVersion = version;
+  raw.CFBundleVersion = versionCode;
 
   // If RenderGloss enabled,
   if (manifest.ios && manifest.ios.icons && manifest.ios.icons.renderGloss) {
