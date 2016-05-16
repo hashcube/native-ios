@@ -139,7 +139,7 @@
 
 	[self.window makeKeyAndVisible];
 	if (self.pluginManager) {
-        [self.pluginManager didFinishLaunchingWithOptions:options application:app];
+              [self.pluginManager didFinishLaunchingWithOptions:options application:app];
 }
 	return YES;
 }
