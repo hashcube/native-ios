@@ -161,6 +161,10 @@ JSAG_OBJECT_END
 	[[NSNotificationCenter defaultCenter] postNotificationName:@"GameClosurePlugin" object:self userInfo:dict];
 }
 
+- (BOOL) didFinishLaunchingWithOptions:(NSDictionary *)launchOptions application:(UIApplication *)app {
+	[self postNotification:@"didFinishLaunchingWithOptions:application:" obj1:launchOptions obj2:app];
+}
+
 - (void) initializeWithManifest:(NSDictionary *)manifest appDelegate:(TeaLeafAppDelegate *)appDelegate {
 	[self postNotification:@"initializeWithManifest:appDelegate:" obj1:manifest obj2:appDelegate];
 }
