@@ -30,7 +30,7 @@
 @required
 - (void) initializeWithManifest:(NSDictionary *)manifest appDelegate:(TeaLeafAppDelegate *)appDelegate;
 @optional
-- (BOOL) didFinishLaunchingWithOptions:(NSDictionary*)launchOptions application:(UIApplication *)app;
+- (BOOL) didFinishLaunchingWithOptions:(NSDictionary *)launchOptions application:(UIApplication *)app;
 - (void) didFailToRegisterForRemoteNotificationsWithError:(NSError *)error application:(UIApplication *)app;
 - (void) didReceiveRemoteNotification:(NSDictionary *)userInfo application:(UIApplication *)app;
 - (void) didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken application:(UIApplication *)app;

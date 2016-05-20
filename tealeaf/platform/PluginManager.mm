@@ -161,7 +161,7 @@ JSAG_OBJECT_END
 	[[NSNotificationCenter defaultCenter] postNotificationName:@"GameClosurePlugin" object:self userInfo:dict];
 }
 
-- (BOOL) didFinishLaunchingWithOptions:(NSDictionary*)launchOptions application:(UIApplication *)app {
+- (BOOL) didFinishLaunchingWithOptions:(NSDictionary *)launchOptions application:(UIApplication *)app {
 	[self postNotification:@"didFinishLaunchingWithOptions:application:" obj1:launchOptions obj2:app];
 }
 
