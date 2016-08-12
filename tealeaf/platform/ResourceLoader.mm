@@ -36,7 +36,7 @@
 
 #define MAX_HALFSIZE_SKIP 64
 
-static BOOL VERBOSE_LOGS = false;
+static BOOL VERBOSE_LOGS = true;
 static ResourceLoader *instance = nil;
 static NSThread *imgThread = nil;
 static const char *base_path = 0;
@@ -110,7 +110,7 @@ static int base_path_len = 0;
 
 	self.appBundle = [[NSBundle mainBundle] pathForResource:@"resources" ofType:@"bundle"];
 
-	NSLog(@"Using resource path %@", self.appBundle);
+	NSLOG(@"Using resource path %@", self.appBundle);
 	
 	self.appBase = [[NSBundle mainBundle] resourcePath];
 	self.images = [[[NSMutableArray alloc] init] autorelease];
@@ -127,7 +127,7 @@ static int base_path_len = 0;
 - (NSString *) initStringWithContentsOfURL:(NSString *)url {
 	//check config for test app
 
-	NSURLRequest *request = [NSURLRequest requestWithURL:[self resolve:url] cachePolicy:0 timeoutInterval:600];
+	NSURLRequest *request = [NSURLRequest requestWithURL:[self resolve:url] cachePolicy:NSURLRequestUseProtocolCachePolicy timeoutInterval:600];
 	NSURLResponse *response = nil;
 	NSError *error = nil;
 	NSData *data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
@@ -198,12 +198,14 @@ static int base_path_len = 0;
 - (void) makeTexture2DFromData: (NSData*) data url: (NSString*) url {
     unsigned char *tex_data = NULL;
     int ch, w, h, ow, oh, scale;
-    unsigned int raw_length = [data length];
+    unsigned long raw_length = [data length];
     if (raw_length > 0) {
         const void *raw_data = [data bytes];
         
         if (raw_data) {
-            tex_data = texture_2d_load_texture_raw([url UTF8String], raw_data, raw_length, &ch, &w, &h, &ow, &oh, &scale);
+            long size;
+            int compression_type;
+            tex_data = texture_2d_load_texture_raw([url UTF8String], raw_data, raw_length, &ch, &w, &h, &ow, &oh, &scale, &size, &compression_type);
         }
     }
     
@@ -217,50 +219,49 @@ static int base_path_len = 0;
 }
 
 - (void) imageThread {
-	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
-	while(true) {
-		//continue;
-		[self.imageWaiter lock];
-		[self.imageWaiter wait];
-		NSArray* imgs = [NSArray arrayWithArray: self.images];
-		[self.images removeAllObjects];
-		[self.imageWaiter unlock];
-		do {
-			for (NSUInteger i = 0, count = [imgs count]; i < count; i++) {
-				NSString* url = [imgs objectAtIndex:i];
-				NSLOG(@"{resources} Loading url:%@", url);
-				if([url hasPrefix: @"@TEXT"]) {
-					[self performSelectorOnMainThread: @selector(finishLoadingText:) withObject: url waitUntilDone:NO];
-				} else if([url hasPrefix: @"@CONTACTPICTURE"]) {
-					// TODO Contact pictures again...
-				} else if([url hasPrefix: @"MULTICONTACTPICTURES"]) {
-					// TODO sprite contact pictures...
-					NSLOG(@"{resources} ERROR: Contact pictures not supported yet!");
-				} else if([url hasPrefix: @"CAMERA"]) {
-					// do nothing for now
-					NSLOG(@"{resources} ERROR: Camera not supported yet!");
-				} else if([url hasPrefix: @"GALLERYPHOTO"]) {
-					// do nothing for now
-					NSLOG(@"{resources} ERROR: Gallery photo picking not supported yet!");
-				} else {
-					// it's a plain url
-					NSData* data = nil;
-					if([url hasPrefix: @"data:"]) {
-						NSRange range = [url rangeOfString:@","];
-						NSString* str = [url substringFromIndex: range.location+1];
-						data = decodeBase64(str);
-					} else {
-                        data = [NSData dataWithContentsOfURL: [self resolve:url]];
-                        [self makeTexture2DFromData: data url: url];
-					}
-				}
-			}
-			imgs = [NSArray arrayWithArray: self.images];
-			[self.images removeAllObjects];
-		} while([imgs count] > 0);
-	}
-
-	[pool release];
+  @autoreleasepool {
+    while(true) {
+      //continue;
+      [self.imageWaiter lock];
+      [self.imageWaiter wait];
+      NSArray* imgs = [NSArray arrayWithArray: self.images];
+      [self.images removeAllObjects];
+      [self.imageWaiter unlock];
+      do {
+        for (NSUInteger i = 0, count = [imgs count]; i < count; i++) {
+          NSString* url = [imgs objectAtIndex:i];
+          NSLOG(@"{resources} Loading url:%@", url);
+          if([url hasPrefix: @"@TEXT"]) {
+            [self performSelectorOnMainThread: @selector(finishLoadingText:) withObject: url waitUntilDone:NO];
+          } else if([url hasPrefix: @"@CONTACTPICTURE"]) {
+            // TODO Contact pictures again...
+          } else if([url hasPrefix: @"MULTICONTACTPICTURES"]) {
+            // TODO sprite contact pictures...
+            NSLOG(@"{resources} ERROR: Contact pictures not supported yet!");
+          } else if([url hasPrefix: @"CAMERA"]) {
+            // do nothing for now
+            NSLOG(@"{resources} ERROR: Camera not supported yet!");
+          } else if([url hasPrefix: @"GALLERYPHOTO"]) {
+            // do nothing for now
+            NSLOG(@"{resources} ERROR: Gallery photo picking not supported yet!");
+          } else {
+            // it's a plain url
+            NSData* data = nil;
+            if([url hasPrefix: @"data:"]) {
+              NSRange range = [url rangeOfString:@","];
+              NSString* str = [url substringFromIndex: range.location+1];
+              data = decodeBase64(str);
+            } else {
+              data = [NSData dataWithContentsOfURL: [self resolve:url]];
+              [self makeTexture2DFromData: data url: url];
+            }
+          }
+        }
+        imgs = [NSArray arrayWithArray: self.images];
+        [self.images removeAllObjects];
+      } while([imgs count] > 0);
+    }
+  }
 }
 
 - (UIImage *) normalize: (UIImage *) src {
@@ -328,7 +329,7 @@ static int base_path_len = 0;
 		Texture2D *tex = [[[Texture2D alloc] initWithString:str fontName:family fontSize:size color:colorf maxWidth:maxWidth textStyle:textStyle strokeWidth:strokeWidth] autorelease];
 
 		if (tex) {
-			texture_manager_on_texture_loaded(texture_manager_get(), [url UTF8String], tex.name, tex.width, tex.height, tex.originalWidth, tex.originalHeight, 4, 1, true);
+			texture_manager_on_texture_loaded(texture_manager_get(), [url UTF8String], tex.name, tex.width, tex.height, tex.originalWidth, tex.originalHeight, 4, 1, true, 0, 0);
 			if (VERBOSE_LOGS) {
 				NSLOG(@"{resources} Loaded text %@ id:%d (%d,%d)->(%u,%u)", url, tex.name, tex.originalWidth, tex.originalHeight, tex.width, tex.height);
 			}
@@ -339,7 +340,7 @@ static int base_path_len = 0;
 - (void) finishLoadingImage:(ImageInfo *)info {
 	Texture2D* tex = [[Texture2D alloc] initWithImage:info.image andUrl: info.url];
 	int scale = use_halfsized_textures ? 2 : 1;
-	texture_manager_on_texture_loaded(texture_manager_get(), [tex.src UTF8String], tex.name, tex.width * scale, tex.height * scale, tex.originalWidth * scale, tex.originalHeight * scale, 4, scale, false);
+	texture_manager_on_texture_loaded(texture_manager_get(), [tex.src UTF8String], tex.name, tex.width * scale, tex.height * scale, tex.originalWidth * scale, tex.originalHeight * scale, 4, scale, false, 0, 0);
 	NSString* evt = [NSString stringWithFormat: @"{\"name\":\"imageLoaded\",\"url\":\"%@\",\"glName\":%d,\"width\":%d,\"height\":%d,\"originalWidth\":%d,\"originalHeight\":%d}",
 					 tex.src, tex.name, tex.width, tex.height, tex.originalWidth, tex.originalHeight];
 	core_dispatch_event([evt UTF8String]);
@@ -372,11 +373,10 @@ static int base_path_len = 0;
 	//create the texture
 	int shift = info.scale - 1;
 	GLTRACE(glTexImage2D(GL_TEXTURE_2D, 0, format, info.w >> shift, info.h >> shift, 0, format, GL_UNSIGNED_BYTE, info.raw_data));
-	core_check_gl_error();
 
 	texture_manager_on_texture_loaded(texture_manager_get(), url, texture,
 									  info.w, info.h, info.ow, info.oh,
-									  info.channels, info.scale, false);
+									  info.channels, info.scale, false, 0, 0);
     
     [self sendImageLoadedEventForURL:[info.url UTF8String] glName:texture width:info.w height:info.h originalWidth:info.ow originalHeight:info.oh];
 	
@@ -430,8 +430,8 @@ static int base_path_len = 0;
 static bool read_file(const char *url, unsigned long *sz, unsigned char **data) {
 	// Try to use stack memory if it is small
 	char full_path[512];
-	int url_len = strlen(url);
-	int full_path_len = base_path_len + url_len + 1 + 1;
+	unsigned long url_len = strlen(url);
+	unsigned long full_path_len = base_path_len + url_len + 1 + 1;
 	char *path = full_path;
 	if (full_path_len > sizeof(full_path)) {
 		path = (char*)malloc(full_path_len);
@@ -446,19 +446,19 @@ static bool read_file(const char *url, unsigned long *sz, unsigned char **data) 
 	bool success = false;
 
 	if (fd != -1) {
-		unsigned long len = lseek(fd, 0, SEEK_END);
+		off_t len = lseek(fd, 0, SEEK_END);
 
 		fcntl(fd, F_NOCACHE, 1);
 		fcntl(fd, F_RDAHEAD, 1);
 
 		if (len > 0) {
-			void *raw = mmap(0, len, PROT_READ, MAP_PRIVATE, fd, 0);
+			void *raw = mmap(0, (size_t)len, PROT_READ, MAP_PRIVATE, fd, 0);
 
 			if (raw == MAP_FAILED) {
 				LOG("{resources} WARNING: mmap failed errno=%d for %s/%s len=%d", errno, base_path, url, (int)len);
 			} else {
 				*data = (unsigned char*)raw;
-				*sz = len;
+				*sz = (unsigned long)len;
 				success = true;
 			}
 		}
@@ -491,7 +491,7 @@ CEXPORT bool resource_loader_load_image_with_c(texture_2d *texture) {
 			data = (unsigned char*)[nsd bytes];
 			sz = [nsd length];
 			
-			texture->pixel_data = texture_2d_load_texture_raw(texture->url, data, sz, &texture->num_channels, &texture->width, &texture->height, &texture->originalWidth, &texture->originalHeight, &texture->scale);
+			texture->pixel_data = texture_2d_load_texture_raw(texture->url, data, sz, &texture->num_channels, &texture->width, &texture->height, &texture->originalWidth, &texture->originalHeight, &texture->scale, &texture->used_texture_bytes, &texture->compression_type);
 			
 			return true;
 		}
@@ -502,7 +502,7 @@ CEXPORT bool resource_loader_load_image_with_c(texture_2d *texture) {
 
 		return false;
 	} else {
-		texture->pixel_data = texture_2d_load_texture_raw(texture->url, data, sz, &texture->num_channels, &texture->width, &texture->height, &texture->originalWidth, &texture->originalHeight, &texture->scale);
+		texture->pixel_data = texture_2d_load_texture_raw(texture->url, data, sz, &texture->num_channels, &texture->width, &texture->height, &texture->originalWidth, &texture->originalHeight, &texture->scale, &texture->used_texture_bytes, &texture->compression_type);
 		
 		// Release map
 		munmap(data, sz);
