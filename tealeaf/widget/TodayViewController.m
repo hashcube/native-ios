@@ -64,7 +64,7 @@
 }
 
 - (void)updateActionLabel {
-    NSUserDefaults *defaults = [[NSUserDefaults alloc] initWithSuiteName:@"group.hashcube.sqtest"];
+    NSUserDefaults *defaults = [[NSUserDefaults alloc] initWithSuiteName:@"group.hashcube.games"];
     NSString *number = [defaults stringForKey:@"widgetActionLabel"];
 
     if([number length] == 0) {
