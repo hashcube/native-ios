@@ -65,7 +65,7 @@
 
 - (void)updateActionLabel {
     NSUserDefaults *defaults = [[NSUserDefaults alloc] initWithSuiteName:@"group.hashcube.games"];
-    NSString *number = [defaults stringForKey:@"widgetActionLabel"];
+    NSString *number = [defaults stringForKey:@"play"];
 
     if([number length] == 0) {
         // TODO: localize this
