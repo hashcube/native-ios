@@ -214,6 +214,7 @@ function buildXcodeProject(api, app, config) {
 
       var widgetPlist = updatePlist.getInfoPlist(config.xcodeProjectPath + '/widget');
       var raw = widgetPlist.getRaw();
+      raw.CFBundleDisplayName = app.manifest.title || "";
       raw.CFBundleIdentifier = config.bundleID + '.widget';
 
       return Promise
