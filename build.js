@@ -46,13 +46,16 @@ var getModuleConfig = function(modulePath) {
   return config;
 };
 
-var installModule = function (app, config, modulePath, xcodeProject, infoPlist) {
+var installModule = function (app, config, modulePath, xcodeProject, infoPlist, entitlements) {
   var moduleConfig = getModuleConfig(modulePath);
   return xcodeProject
     .installModule(modulePath, moduleConfig)
     .then(function () {
       if (moduleConfig.plist) {
         infoPlist.add(app.manifest, moduleConfig.plist);
+      }
+      if (moduleConfig.entitlements) {
+        entitlements.add(app.manifest, moduleConfig.entitlements);
       }
     });
 };
@@ -208,6 +211,7 @@ function buildXcodeProject(api, app, config) {
     .then(function (xcodeProject) {
       var infoPlist = updatePlist.getInfoPlist(config.xcodeProjectPath);
       var configPlist = updatePlist.get(path.join(config.xcodeProjectPath, 'resources', 'config.plist'));
+      var entitlements = updatePlist.get(path.join(config.xcodeProjectPath, 'TeaLeafIOS.entitlements'));
       updateInfoPlist(app, config, infoPlist);
       updateConfigPlist(app, config, configPlist);
 
@@ -220,7 +224,7 @@ function buildXcodeProject(api, app, config) {
           return !!iosExtension;
         })
         .each(function(iosExtension) {
-          return installModule(app, config, iosExtension, xcodeProject, infoPlist);
+          return installModule(app, config, iosExtension, xcodeProject, infoPlist, entitlements);
         })
         .then(function () {
           return [
@@ -235,7 +239,8 @@ function buildXcodeProject(api, app, config) {
           return [
             xcodeProject.write(),
             infoPlist.write(),
-            configPlist.write()
+            configPlist.write(),
+            entitlements.write()
           ];
         })
         .all();
