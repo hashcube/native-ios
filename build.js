@@ -241,8 +241,8 @@ function buildXcodeProject(api, app, config) {
             xcodeProject.write(),
             infoPlist.write(),
             configPlist.write(),
-            entitlements.write()
-            widgetPlist.write(),
+            entitlements.write(),
+            widgetPlist.write()
           ];
         })
         .all();
