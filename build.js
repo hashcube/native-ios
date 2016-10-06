@@ -149,9 +149,6 @@ function updateInfoPlist(app, config, plist) {
   if(app.manifest.ios.requireFullScreen) {
     raw.UIRequiresFullScreen = app.manifest.ios.requireFullScreen;
   }
-  if(app.manifest.ios.requiredBackgroundModes) {
-    raw.UIBackgroundModes = app.manifest.ios.requiredBackgroundModes;
-  }
 
   // For each URLTypes array entry,
   var found = 0;
