@@ -10,8 +10,7 @@
 #import <NotificationCenter/NotificationCenter.h>
 
 @interface TodayViewController () <NCWidgetProviding>
-@property (strong, nonatomic) IBOutlet UIView *actionButton;
-@property (weak, nonatomic) IBOutlet UILabel *actionLabel;
+@property (weak, nonatomic) IBOutlet UIButton *actionButton;
 
 @end
 
@@ -72,7 +71,7 @@
         number = @"Play";
     }
 
-    [self.actionLabel setText:number];
+    [self.actionButton setTitle:number forState:UIControlStateNormal];
 }
 
 @end
