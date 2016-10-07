@@ -2,8 +2,8 @@
 //  TodayViewController.h
 //  widget
 //
-//  Created by panda on 04/10/16.
-//  Copyright © 2016 Game Closure. All rights reserved.
+//  Created by Jishnu Mohan <jishnu7@gmail.com> on 04/10/16.
+//  Copyright © 2016 Hashcube. All rights reserved.
 //
 
 #import <UIKit/UIKit.h>
