@@ -63,7 +63,7 @@
 }
 
 - (void)updateActionLabel {
-    NSUserDefaults *defaults = [[NSUserDefaults alloc] initWithSuiteName:@"group.hashcube.games"];
+    NSUserDefaults *defaults = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.hashcube.sudokuquest"];
     NSString *number = [defaults stringForKey:@"play"];
 
     if([number length] == 0) {
