@@ -95,9 +95,10 @@
 		5BAE3E111797939900E8058E /* CoreTelephony.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5BAE3E101797939900E8058E /* CoreTelephony.framework */; };
 		5BB2AD9D17C82C1E003CA689 /* graphics_utils.c in Sources */ = {isa = PBXBuildFile; fileRef = 5BB2AD9B17C82C1E003CA689 /* graphics_utils.c */; };
 		8BC3D5E21639FFD2007942C3 /* OALSourceInfo.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8BC3D5E11639FFD2007942C3 /* OALSourceInfo.mm */; };
-		BADA830E1DA5040500DA8B37 /* NotificationCenter.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BADA830D1DA5040500DA8B37 /* NotificationCenter.framework */; };
 		BA6001301DA677070036F725 /* play.png in Resources */ = {isa = PBXBuildFile; fileRef = BA60012F1DA677070036F725 /* play.png */; };
-
+		BAD679001DA7CC4900E825E3 /* play@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = BAD678FE1DA7CC4900E825E3 /* play@2x.png */; };
+		BAD679011DA7CC4900E825E3 /* play@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = BAD678FF1DA7CC4900E825E3 /* play@3x.png */; };
+		BADA830E1DA5040500DA8B37 /* NotificationCenter.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BADA830D1DA5040500DA8B37 /* NotificationCenter.framework */; };
 		BADA83121DA5040600DA8B37 /* TodayViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = BADA83111DA5040600DA8B37 /* TodayViewController.m */; };
 		BADA83151DA5040600DA8B37 /* MainInterface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = BADA83131DA5040600DA8B37 /* MainInterface.storyboard */; };
 		BADA83191DA5040600DA8B37 /* widget.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = BADA830C1DA5040500DA8B37 /* widget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
@@ -530,10 +531,12 @@
 		AEDE13B21A672ED700E71BFE /* Utility.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Utility.h; sourceTree = "<group>"; };
 		AEDE13B31A672ED700E71BFE /* Value.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Value.h; sourceTree = "<group>"; };
 		AEDE13B41A672ED700E71BFE /* Vector.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Vector.h; sourceTree = "<group>"; };
+		BA60012F1DA677070036F725 /* play.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = play.png; sourceTree = "<group>"; };
+		BAD678FE1DA7CC4900E825E3 /* play@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "play@2x.png"; sourceTree = "<group>"; };
+		BAD678FF1DA7CC4900E825E3 /* play@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "play@3x.png"; sourceTree = "<group>"; };
 		BADA830C1DA5040500DA8B37 /* widget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = widget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		BADA830D1DA5040500DA8B37 /* NotificationCenter.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = NotificationCenter.framework; path = System/Library/Frameworks/NotificationCenter.framework; sourceTree = SDKROOT; };
 		BADA83101DA5040600DA8B37 /* TodayViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TodayViewController.h; sourceTree = "<group>"; };
-		BA60012F1DA677070036F725 /* play.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = play.png; sourceTree = "<group>"; };
 		BADA83111DA5040600DA8B37 /* TodayViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TodayViewController.m; sourceTree = "<group>"; };
 		BADA83141DA5040600DA8B37 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/MainInterface.storyboard; sourceTree = "<group>"; };
 		BADA83161DA5040600DA8B37 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -1057,6 +1060,8 @@
 			children = (
 				BADA83101DA5040600DA8B37 /* TodayViewController.h */,
 				BA60012F1DA677070036F725 /* play.png */,
+				BAD678FE1DA7CC4900E825E3 /* play@2x.png */,
+				BAD678FF1DA7CC4900E825E3 /* play@3x.png */,
 				BADA83111DA5040600DA8B37 /* TodayViewController.m */,
 				BADA83131DA5040600DA8B37 /* MainInterface.storyboard */,
 				BADA83161DA5040600DA8B37 /* Info.plist */,
@@ -1487,6 +1492,8 @@
 			files = (
 				BADA83151DA5040600DA8B37 /* MainInterface.storyboard in Resources */,
 				BA6001301DA677070036F725 /* play.png in Resources */,
+				BAD679001DA7CC4900E825E3 /* play@2x.png in Resources */,
+				BAD679011DA7CC4900E825E3 /* play@3x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1723,7 +1730,7 @@
 				LLVM_LTO = NO;
 				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
 				OTHER_LDFLAGS = "-lstdc++";
-				PARENT_APP_BUNDLE_IDENTIFIER = "asd";
+				PARENT_APP_BUNDLE_IDENTIFIER = "TeaLeafIOS";
 				PROVISIONING_PROFILE = "";
 				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
 				SDKROOT = iphoneos;
@@ -1765,7 +1772,7 @@
 				LLVM_LTO = NO;
 				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
 				OTHER_LDFLAGS = "-lstdc++";
-				PARENT_APP_BUNDLE_IDENTIFIER = "asd";
+				PARENT_APP_BUNDLE_IDENTIFIER = "TeaLeafIOS";
 				PROVISIONING_PROFILE = "";
 				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
 				SDKROOT = iphoneos;
