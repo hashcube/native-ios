@@ -15,43 +15,40 @@
                         <viewControllerLayoutGuide type="bottom" id="FKl-LY-JtV"/>
                     </layoutGuides>
                     <view key="view" contentMode="scaleToFill" simulatedAppContext="notificationCenter" id="S3S-Oj-5AN">
-                        <rect key="frame" x="0.0" y="0.0" width="320" height="80"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES" heightSizable="YES" flexibleMaxY="YES"/>
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="100"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="tnx-Fs-dwC">
-                                <frame key="frameInset" minX="50.00%" minY="12.50%" width="40" height="40"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
-                                <state key="normal" title="Button" image="play.png"/>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="clip" translatesAutoresizingMaskIntoConstraints="NO" id="x1x-R1-WrV">
+                                <inset key="titleEdgeInsets" minX="15" minY="0.0" maxX="0.0" maxY="0.0"/>
+                                <state key="normal" title="Play" image="play.png"/>
                                 <connections>
-                                    <action selector="launchHostingApp:" destination="M4Y-Lb-cyx" eventType="touchUpInside" id="HZd-JI-p3F"/>
+                                    <action selector="launchHostingApp:" destination="M4Y-Lb-cyx" eventType="touchUpInside" id="sC0-yU-YfC"/>
                                 </connections>
                             </button>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Play" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="LCj-ds-cgT">
-                                <frame key="frameInset" minX="0.0%" minY="50.00%" width="100.00%" height="40.00%"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES" heightSizable="YES" flexibleMaxY="YES"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                <nil key="textColor"/>
-                                <nil key="highlightedColor"/>
-                            </label>
                         </subviews>
+                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstAttribute="trailing" secondItem="x1x-R1-WrV" secondAttribute="trailing" constant="10" id="EbX-qc-wVO"/>
+                            <constraint firstItem="FKl-LY-JtV" firstAttribute="top" secondItem="x1x-R1-WrV" secondAttribute="bottom" id="kv9-pU-J3V"/>
+                            <constraint firstItem="x1x-R1-WrV" firstAttribute="top" secondItem="Ft6-oW-KC0" secondAttribute="bottom" id="q59-nj-JgB"/>
+                            <constraint firstItem="x1x-R1-WrV" firstAttribute="leading" secondItem="S3S-Oj-5AN" secondAttribute="leading" constant="10" id="trw-mq-IXG"/>
+                        </constraints>
                     </view>
                     <extendedEdge key="edgesForExtendedLayout"/>
                     <nil key="simulatedStatusBarMetrics"/>
                     <nil key="simulatedTopBarMetrics"/>
                     <nil key="simulatedBottomBarMetrics"/>
                     <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
-                    <size key="freeformSize" width="320" height="80"/>
+                    <size key="freeformSize" width="320" height="100"/>
                     <connections>
-                        <outlet property="actionButton" destination="S3S-Oj-5AN" id="Bo7-2a-9gV"/>
-                        <outlet property="actionLabel" destination="LCj-ds-cgT" id="KkN-Xe-oCK"/>
+                        <outlet property="actionButton" destination="x1x-R1-WrV" id="zyW-Hs-4hP"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="vXp-U4-Rya" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="116.8" y="123.23838080959521"/>
         </scene>
     </scenes>
     <resources>
-        <image name="play.png" width="512" height="512"/>
+        <image name="play.png" width="64" height="64"/>
     </resources>
 </document>
