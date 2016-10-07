@@ -212,6 +212,11 @@ function buildXcodeProject(api, app, config) {
       updateInfoPlist(app, config, infoPlist);
       updateConfigPlist(app, config, configPlist);
 
+      var widgetPlist = updatePlist.getInfoPlist(config.xcodeProjectPath + '/widget');
+      var raw = widgetPlist.getRaw();
+      raw.CFBundleDisplayName = app.manifest.title || "";
+      raw.CFBundleIdentifier = config.bundleID + '.widget';
+
       return Promise
         .resolve(Object.keys(app.modules))
         .map(function (moduleName) {
@@ -237,7 +242,8 @@ function buildXcodeProject(api, app, config) {
             xcodeProject.write(),
             infoPlist.write(),
             configPlist.write(),
-            entitlements.write()
+            entitlements.write(),
+            widgetPlist.write()
           ];
         })
         .all();
