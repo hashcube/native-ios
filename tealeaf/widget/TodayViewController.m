@@ -51,7 +51,7 @@
 {
     // TODO: use sender.tag to identify the button and send widgetAction based on that
     NSString *bundleIdentifier = [[NSBundle mainBundle] bundleIdentifier];
-    bundleIdentifier = [bundleIdentifier stringByReplacingOccurrencesOfString: @".widget" withString:@""];
+    bundleIdentifier = [bundleIdentifier stringByReplacingOccurrencesOfString: @".twidget" withString:@""];
 
     NSString *urlString = [NSString stringWithFormat:@"%@://widget?widgetAction=play", bundleIdentifier];
     
