@@ -20,6 +20,8 @@
 	<string>gc.native.launchClient</string>
 	<key>game_hash</key>
 	<string>GameHash</string>
+	<key>app_group</key>
+	<string></string>
 	<key>native_hash</key>
 	<string>NativeHash</string>
 	<key>push_url</key>
