@@ -150,6 +150,8 @@ function updateInfoPlist(app, config, plist) {
     raw.UIRequiresFullScreen = app.manifest.ios.requireFullScreen;
   }
 
+  raw.WidgetGroup = config.widgetGroup;
+
   // For each URLTypes array entry,
   var found = 0;
   for (var ii = 0; ii < raw.CFBundleURLTypes.length; ++ii) {
@@ -195,7 +197,6 @@ function updateConfigPlist(app, config, plist) {
       code_path: 'native.js',
       studio_name: (app.manifest.studio && app.manifest.studio.name) || "example.studio",
       debug_build: config.debug,
-
       apple_id: app.manifest.ios && app.manifest.ios.appleID || "example.appleid",
       bundle_id: config.bundleID,
       version: config.version
@@ -212,10 +213,17 @@ function buildXcodeProject(api, app, config) {
       updateInfoPlist(app, config, infoPlist);
       updateConfigPlist(app, config, configPlist);
 
+      // TODO: move this out to a module
       var widgetPlist = updatePlist.getInfoPlist(config.xcodeProjectPath + '/widget');
       var raw = widgetPlist.getRaw();
       raw.CFBundleDisplayName = app.manifest.title || "";
-      raw.CFBundleIdentifier = config.bundleID + '.twidget';
+      raw.CFBundleIdentifier = config.bundleID + '.' + config.widgetID;
+      raw.WidgetGroup = config.widgetGroup;
+      var widgetEntitlements = updatePlist.get(config.xcodeProjectPath + '/widget/widget.entitlements');
+      var rawEntitlements = entitlements.getRaw();
+      rawEntitlements['com.apple.security.application-groups'] = [config.widgetGroup];
+      var rawWidgetEntitlements = widgetEntitlements.getRaw();
+      rawWidgetEntitlements['com.apple.security.application-groups'] = [config.widgetGroup];
 
       return Promise
         .resolve(Object.keys(app.modules))
@@ -243,7 +251,8 @@ function buildXcodeProject(api, app, config) {
             infoPlist.write(),
             configPlist.write(),
             entitlements.write(),
-            widgetPlist.write()
+            widgetPlist.write(),
+            widgetEntitlements.write()
           ];
         })
         .all();

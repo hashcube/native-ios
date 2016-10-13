@@ -63,7 +63,9 @@
 }
 
 - (void)updateActionLabel {
-    NSUserDefaults *defaults = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.hashcube.sudokuquest"];
+    NSString *appGroup = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"AppGroup"];
+
+    NSUserDefaults *defaults = [[NSUserDefaults alloc] initWithSuiteName:appGroup];
     NSString *number = [defaults stringForKey:@"play"];
 
     if([number length] == 0) {
