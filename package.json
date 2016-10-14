@@ -13,6 +13,7 @@
     "xcode": "git+ssh://git@github.com:hashcube/node-xcode.git#hc"
   },
   "scripts": {
+    "preinstall": "sh ./preinstall.sh"
   },
   "private": true,
   "repository": {

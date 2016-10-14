@@ -150,8 +150,6 @@ function updateInfoPlist(app, config, plist) {
     raw.UIRequiresFullScreen = app.manifest.ios.requireFullScreen;
   }
 
-  raw.WidgetGroup = config.widgetGroup;
-
   // For each URLTypes array entry,
   var found = 0;
   for (var ii = 0; ii < raw.CFBundleURLTypes.length; ++ii) {
@@ -238,6 +236,7 @@ function buildXcodeProject(api, app, config) {
             xcodeProject.write(),
             infoPlist.write(),
             configPlist.write(),
+            entitlements.write()
           ];
         })
         .all();
