@@ -213,18 +213,6 @@ function buildXcodeProject(api, app, config) {
       updateInfoPlist(app, config, infoPlist);
       updateConfigPlist(app, config, configPlist);
 
-      // TODO: move this out to a module
-      var widgetPlist = updatePlist.getInfoPlist(config.xcodeProjectPath + '/widget');
-      var raw = widgetPlist.getRaw();
-      raw.CFBundleDisplayName = app.manifest.title || "";
-      raw.CFBundleIdentifier = config.bundleID + '.' + config.widgetID;
-      raw.WidgetGroup = config.widgetGroup;
-      var widgetEntitlements = updatePlist.get(config.xcodeProjectPath + '/widget/widget.entitlements');
-      var rawEntitlements = entitlements.getRaw();
-      rawEntitlements['com.apple.security.application-groups'] = [config.widgetGroup];
-      var rawWidgetEntitlements = widgetEntitlements.getRaw();
-      rawWidgetEntitlements['com.apple.security.application-groups'] = [config.widgetGroup];
-
       return Promise
         .resolve(Object.keys(app.modules))
         .map(function (moduleName) {
@@ -250,9 +238,6 @@ function buildXcodeProject(api, app, config) {
             xcodeProject.write(),
             infoPlist.write(),
             configPlist.write(),
-            entitlements.write(),
-            widgetPlist.write(),
-            widgetEntitlements.write()
           ];
         })
         .all();
