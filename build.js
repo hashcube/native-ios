@@ -195,7 +195,6 @@ function updateConfigPlist(app, config, plist) {
       code_path: 'native.js',
       studio_name: (app.manifest.studio && app.manifest.studio.name) || "example.studio",
       debug_build: config.debug,
-
       apple_id: app.manifest.ios && app.manifest.ios.appleID || "example.appleid",
       bundle_id: config.bundleID,
       version: config.version
