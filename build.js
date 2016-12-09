@@ -60,6 +60,35 @@ var installModule = function (app, config, modulePath, xcodeProject, infoPlist, 
     });
 };
 
+function executeOnCreate(api, app, config) {
+  var modules = app.modules;
+  var hookName = 'onCreateProject';
+
+  return Promise.resolve(Object.keys(modules))
+    .map(function (moduleName) {
+      var module = modules[moduleName];
+      var buildExtension = module.extensions && module.extensions.build;
+
+      buildExtension = buildExtension ? require(buildExtension) : null;
+
+      if (!buildExtension || !buildExtension[hookName]) {
+        return;
+      }
+
+      return new Promise(function (resolve, reject) {
+          var retVal = buildExtension[hookName](api, app, config, function (err, res) {
+            if (err) {
+              reject(err);
+            } else {
+              resolve(res);
+            }
+          });
+
+          if (retVal) { resolve(retVal); }
+        })
+    });
+}
+
 function updateConfig(config) {
   if (!config.xcodeProjectPath) {
     config.xcodeProjectPath = path.join(config.outputPath, 'xcodeproject');
@@ -236,7 +265,8 @@ function buildXcodeProject(api, app, config) {
             xcodeProject.write(),
             infoPlist.write(),
             configPlist.write(),
-            entitlements.write()
+            entitlements.write(),
+            executeOnCreate(api, app, config)
           ];
         })
         .all();
