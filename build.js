@@ -252,6 +252,19 @@ function buildXcodeProject(api, app, config) {
           return installModule(app, config, iosExtension, xcodeProject, infoPlist, entitlements);
         })
         .then(function () {
+          var key = "com.apple.developer.associated-domains";
+          var appLinks = app.manifest.ios && app.manifest.ios.app_link_domains;
+          var rawEntitlements = entitlements.getRaw();
+          var resLinks = rawEntitlements[key] || [];
+
+          if (appLinks && appLinks.length > 0) {
+            appLinks.forEach(function (curr) {
+              resLinks.push("applinks:" + curr);
+            });
+            rawEntitlements[key] = resLinks;
+          }
+        })
+        .then(function () {
           return [
             copyResources.copyIcons(api, app, config),
             copyResources.copySplash(api, app, config),
