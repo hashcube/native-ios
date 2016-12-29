@@ -253,7 +253,7 @@ function buildXcodeProject(api, app, config) {
         })
         .then(function () {
           var key = "com.apple.developer.associated-domains";
-          var appLinks = app.manifest.ios && app.manifest.ios.app_link_domains;
+          var appLinks = app.manifest.ios && app.manifest.ios.appLinks;
           var rawEntitlements = entitlements.getRaw();
           var resLinks = rawEntitlements[key] || [];
 
