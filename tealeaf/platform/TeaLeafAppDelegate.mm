@@ -141,6 +141,14 @@
 	return YES;
 }
 
+- (BOOL)application:(UIApplication *)app continueUserActivity:(NSUserActivity *)userActivity restorationHandler:(void (^)(NSArray *restorableObjects))restorationHandle {
+	if ([userActivity.activityType isEqualToString:NSUserActivityTypeBrowsingWeb]) {
+		NSURL *webpageURL = [userActivity webpageURL];
+		[self.pluginManager appLaunchedFromLink: webpageURL];
+	}
+
+	return YES;
+}
 
 - (void) restartJS {
 	if (!self.isTestApp) {

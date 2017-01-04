@@ -40,6 +40,7 @@
 - (void) onPause;
 - (void) onResume;
 - (void) performActionForShortcutItem: (UIApplicationShortcutItem *) shortcutItem;
+- (void) appLaunchedFromLink:(NSURL *) webURL;
 @end
 
 

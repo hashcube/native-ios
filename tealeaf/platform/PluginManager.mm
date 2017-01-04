@@ -204,6 +204,15 @@ JSAG_OBJECT_END
 	[self postNotification:@"performActionForShortcutItem:" obj1:shortcutItem obj2:nil];
 }
 
+- (void) appLaunchedFromLink:(NSURL *) webURL {
+	[self dispatchJSEvent:[NSDictionary dictionaryWithObjectsAndKeys:
+		@"launchedFromLink", @"name",
+		webURL.absoluteString, @"url",
+		webURL.host, @"host",
+		webURL.path, @"path",
+		webURL.query, @"query", nil]];
+}
+
 - (void) dispatchJSEventWithJSONString: (NSString*) str andRequestId:(NSNumber *)requestId {
     if (m_core) {
         JSContext *cx = m_core.cx;
