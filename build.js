@@ -252,16 +252,27 @@ function buildXcodeProject(api, app, config) {
           return installModule(app, config, iosExtension, xcodeProject, infoPlist, entitlements);
         })
         .then(function () {
-          var key = "com.apple.developer.associated-domains";
+          var appLinkKey = "com.apple.developer.associated-domains";
+          var otherAppsKey = "LSApplicationQueriesSchemes";
           var appLinks = app.manifest.ios && app.manifest.ios.appLinks;
+          var otherApps = app.manifest.ios && app.manifest.ios.otherApps;
           var rawEntitlements = entitlements.getRaw();
-          var resLinks = rawEntitlements[key] || [];
+          var rawPlist = infoPlist.getRaw();
+          var resLinks = rawEntitlements[appLinkKey] || [];
+          var resOtherApps = rawPlist[otherAppsKey] || [];
 
           if (appLinks && appLinks.length > 0) {
             appLinks.forEach(function (curr) {
               resLinks.push("applinks:" + curr);
             });
-            rawEntitlements[key] = resLinks;
+            rawEntitlements[appLinkKey] = resLinks;
+          }
+
+          if (otherApps && otherApps.length > 0) {
+            otherApps.forEach(function (curr) {
+              resOtherApps.push(curr);
+            });
+            rawPlist[otherAppsKey] = resOtherApps;
           }
         })
         .then(function () {
