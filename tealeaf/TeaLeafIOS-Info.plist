@@ -15,7 +15,11 @@
 		<string>icon72.png</string>
 		<string>icon144.png</string>
 	</array>
-	<key>CFBundleIcons</key>
+	<key>CFBundleLocalizations</key>
+        <array>
+          <string>en</string>
+        </array>
+        <key>CFBundleIcons</key>
 	<dict/>
 	<key>CFBundleIcons~ipad</key>
 	<dict/>

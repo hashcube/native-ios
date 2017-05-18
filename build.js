@@ -179,6 +179,18 @@ function updateInfoPlist(app, config, plist) {
     raw.UIRequiresFullScreen = app.manifest.ios.requireFullScreen;
   }
 
+  // Add languages
+  var key = "CFBundleLocalizations";
+  var languages = app.manifest.ios.languages || app.manifest.languages;
+  var resLanguages = raw[key] || [];
+
+  if (languages && languages.length > 0) {
+    languages.forEach(function (curr_lang) {
+      resLanguages.push(curr_lang);
+    });
+    raw[key] = resLanguages;
+  }
+
   // For each URLTypes array entry,
   var found = 0;
   for (var ii = 0; ii < raw.CFBundleURLTypes.length; ++ii) {
@@ -261,6 +273,7 @@ function buildXcodeProject(api, app, config) {
           var resLinks = rawEntitlements[appLinkKey] || [];
           var resOtherApps = rawPlist[otherAppsKey] || [];
 
+          // Add App Links
           if (appLinks && appLinks.length > 0) {
             appLinks.forEach(function (curr) {
               resLinks.push("applinks:" + curr);
