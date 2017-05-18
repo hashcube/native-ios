@@ -181,7 +181,7 @@ function updateInfoPlist(app, config, plist) {
 
   // Add languages
   var key = "CFBundleLocalizations";
-  var languages = app.manifest.ios.languages || app.manifest.languages;
+  var languages = app.manifest.ios.languages;
   var resLanguages = raw[key] || [];
 
   if (languages && languages.length > 0) {
