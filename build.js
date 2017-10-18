@@ -247,10 +247,16 @@ function buildXcodeProject(api, app, config) {
     .getXcodeProject(config.xcodeProjectPath)
     .then(function (xcodeProject) {
       var infoPlist = updatePlist.getInfoPlist(config.xcodeProjectPath);
+
       var configPlist = updatePlist.get(path.join(config.xcodeProjectPath, 'resources', 'config.plist'));
       var entitlements = updatePlist.get(path.join(config.xcodeProjectPath, 'TeaLeafIOS.entitlements'));
       updateInfoPlist(app, config, infoPlist);
       updateConfigPlist(app, config, configPlist);
+
+      var stickersPlist = updatePlist.getInfoPlist(config.xcodeProjectPath + '/stickers');
+      var raw = stickersPlist.getRaw();
+      raw.CFBundleDisplayName = app.manifest.title || "";
+      raw.CFBundleIdentifier = config.bundleID + '.sticker';
 
       return Promise
         .resolve(Object.keys(app.modules))
@@ -303,6 +309,7 @@ function buildXcodeProject(api, app, config) {
             infoPlist.write(),
             configPlist.write(),
             entitlements.write(),
+            stickersPlist.write(),
             executeOnCreate(api, app, config)
           ];
         })
