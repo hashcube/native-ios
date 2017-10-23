@@ -296,6 +296,7 @@ function buildXcodeProject(api, app, config) {
         })
         .then(function () {
           return [
+            copyResources.copyStickers(api, app, config),
             copyResources.copyIcons(api, app, config),
             copyResources.copySplash(api, app, config),
             xcodeProject.installModule(null, {frameworks: DEFAULT_FRAMEWORKS}),
