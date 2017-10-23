@@ -28,8 +28,9 @@
 extern "C" {
 #endif
 
-void def_animate_finish(void *js_anim);
-void def_animate_cb(void *js_view, void *cb, double tt, double t);
+void def_animate_add_to_group(JS_OBJECT_WRAPPER js_anim);
+void def_animate_remove_from_group(JS_OBJECT_WRAPPER js_anim);
+void def_animate_cb(JS_OBJECT_WRAPPER js_view, JS_OBJECT_WRAPPER cb, double tt, double t);
 
 #ifdef __cplusplus
 }

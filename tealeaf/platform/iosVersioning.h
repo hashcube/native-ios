@@ -29,8 +29,10 @@
 #define SYSTEM_VERSION_LESS_THAN_OR_EQUAL_TO(v)     ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] != NSOrderedDescending)
 
 
-CEXPORT int get_platform_memory_limit();
+CEXPORT long get_platform_memory_limit();
 
 CEXPORT NSString *get_platform();
+
+CEXPORT bool device_is_simulator();
 
 #endif

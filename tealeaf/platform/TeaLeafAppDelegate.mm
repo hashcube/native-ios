@@ -3,14 +3,14 @@
  *
  * The Game Closure SDK is free software: you can redistribute it and/or modify
  * it under the terms of the Mozilla Public License v. 2.0 as published by Mozilla.
- 
+
  * The Game Closure SDK is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * Mozilla Public License v. 2.0 for more details.
- 
+
  * You should have received a copy of the Mozilla Public License v. 2.0
- * along with the Game Closure SDK.	 If not, see <http://mozilla.org/MPL/2.0/>.
+ * along with the Game Closure SDK.	If not, see <http://mozilla.org/MPL/2.0/>.
  */
 
 #import "TeaLeafAppDelegate.h"
@@ -27,7 +27,6 @@
 #import "core/core_js.h"
 #include "platform.h"
 #include "jsonUtil.h"
-#import "JSONKit.h"
 #include "events.h"
 #import "platform/log.h"
 #import "sys/socket.h"
@@ -65,12 +64,12 @@
 
 - (BOOL)application:(UIApplication *)app didFinishLaunchingWithOptions:(NSDictionary *)options {
 	self.ignoreMemoryWarnings = NO;
-	
+
 	// If on iOS 7,
 	if (SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(@"7.0")) {
 		// If on iPhone 4s
 		if ([get_platform() isEqualToString:@"iPhone4,1"]) {
-			NSLog(@"{core} iOS7-iPhone4s work-around is enabled");
+			NSLOG(@"{core} iOS7-iPhone4s work-around is enabled");
 			self.ignoreMemoryWarnings = YES;
 		}
 	}
@@ -90,8 +89,16 @@
 	self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
 	[self.window makeKeyAndVisible];
 
-    [app registerForRemoteNotificationTypes:
-     (UIRemoteNotificationTypeBadge | UIRemoteNotificationTypeSound | UIRemoteNotificationTypeAlert)];
+	//-- Set Notification
+	if ([[[UIDevice currentDevice] systemVersion] floatValue] >= 8.0) {
+		[app registerUserNotificationSettings:
+			[UIUserNotificationSettings settingsForTypes:
+			(UIUserNotificationTypeSound | UIUserNotificationTypeAlert | UIUserNotificationTypeBadge) categories:nil]];
+		[app registerForRemoteNotifications];
+	} else {
+		[app registerForRemoteNotificationTypes:
+			(UIRemoteNotificationTypeBadge | UIRemoteNotificationTypeSound | UIRemoteNotificationTypeAlert)];
+	}
 
 	//TEALEAF_SPECIFIC_START
 	self.tealeafViewController = [[TeaLeafViewController alloc] init];
@@ -104,6 +111,9 @@
 	for (id key in self.config) {
 		NSLOG(@"{tealeaf} Config[%@] = %@", key, [self.config objectForKey:key]);
 	}
+
+	bool isDebugBuild = [[self.config objectForKey:@"debug_build"] boolValue];
+	self.debugModeBuild = isDebugBuild ? TRUE : FALSE;
 
 	// Detect test-app mode
 	self.isTestApp = NO;
@@ -121,13 +131,21 @@
 		self.window.rootViewController = self.tableViewController;
 	}
 #endif
-	
+
 	if (!self.isTestApp) {
 		[self.window addSubview:self.tealeafViewController.view];
 		self.window.rootViewController = self.tealeafViewController;
 	}
 
 	[self.window makeKeyAndVisible];
+	return YES;
+}
+
+- (BOOL)application:(UIApplication *)app continueUserActivity:(NSUserActivity *)userActivity restorationHandler:(void (^)(NSArray *restorableObjects))restorationHandle {
+	if ([userActivity.activityType isEqualToString:NSUserActivityTypeBrowsingWeb]) {
+		NSURL *webpageURL = [userActivity webpageURL];
+		[self.pluginManager appLaunchedFromLink: webpageURL];
+	}
 
 	return YES;
 }
@@ -141,11 +159,11 @@
 				dispatch_async(dispatch_get_main_queue(), ^{
 					self.signalRestart = NO;
 					core_reset();
-					
+
 					[self.tealeafViewController release];
 
 					self.tealeafViewController = [[TeaLeafViewController alloc] init];
-					
+
 					[self.window addSubview:self.tealeafViewController.view];
 					self.window.rootViewController = self.tealeafViewController;
 				});
@@ -235,16 +253,19 @@
 }
 
 - (void) postPauseEvent:(BOOL) isPaused {
-	NSString* evt = isPaused ? @"{\"name\":\"pause\"}" : @"{\"name\":\"resume\"}";
-	core_dispatch_event([evt UTF8String]);
+    if (js_ready) {
+        NSString* evt = isPaused ? @"{\"name\":\"pause\"}" : @"{\"name\":\"resume\"}";
+        core_dispatch_event([evt UTF8String]);
+        LOG("postPauseEvent");
 
-	if (self.pluginManager) {
-		if (isPaused) {
-			[self.pluginManager onPause];
-		} else {
-			[self.pluginManager onResume];
-		}
-	}
+        if (self.pluginManager) {
+            if (isPaused) {
+                [self.pluginManager onPause];
+            } else {
+                [self.pluginManager onResume];
+            }
+        }
+    }
 }
 
 - (void)applicationWillEnterForeground:(UIApplication *)application
@@ -254,7 +275,7 @@
 
 - (void) applicationDidEnterBackground:(UIApplication *)application
 {
-	UIBackgroundTaskIdentifier bgTask = nil;
+	UIBackgroundTaskIdentifier bgTask = 0;
 
 	bgTask = [application beginBackgroundTaskWithExpirationHandler:^{
 		// With the mighty power of closures, smite this task!
@@ -275,14 +296,12 @@
 // frees all memory for native resources.
 - (void) sleepJS {
 	LOG("{tealeaf} Going to sleep...");
-	
+
 	self.wasPaused = YES;
-	
+
 	[self.canvas stopRendering];
-	
-	if (js_ready) {
-		[self postPauseEvent:self.wasPaused];
-	}
+
+	[self postPauseEvent:self.wasPaused];
 
 	// Remove tealeaf window from screen
 	[self.window removeFromSuperview];
@@ -306,11 +325,8 @@
 
 	self.wasPaused = NO;
 	[self.canvas startRendering];
+
 	[self postPauseEvent:self.wasPaused];
-	
-	if (js_ready) {
-		[self postPauseEvent:self.wasPaused];
-	}
 
 	if (self.pluginManager) {
 		[self.pluginManager applicationDidBecomeActive:[UIApplication sharedApplication]];
@@ -319,12 +335,10 @@
 
 - (void)applicationWillResignActive:(UIApplication *)application {
 	self.wasPaused = YES;
-	
+
 	[self.canvas stopRendering];
-	
-	if (js_ready) {
-		[self postPauseEvent:self.wasPaused];
-	}
+
+	[self postPauseEvent:self.wasPaused];
 
 	LOG("{focus} Lost focus");
 }
@@ -332,16 +346,9 @@
 - (void)applicationDidBecomeActive:(UIApplication *)application {
 	self.wasPaused = NO;
 	[self.canvas startRendering];
+
 	[self postPauseEvent:self.wasPaused];
-
-	if (js_ready) {
-		[self postPauseEvent:self.wasPaused];
-	}
-
-	if (self.pluginManager) {
-		[self.pluginManager applicationDidBecomeActive:application];
-	}
-
+	[self.pluginManager applicationDidBecomeActive:application];
 	LOG("{focus} Gained focus");
 }
 
@@ -349,7 +356,7 @@
 //What else should we do here? TODO
 - (void)applicationWillTerminate:(UIApplication *)application {
 	LOG("{focus} Application will terminate");
-	
+
 	if (self.js) {
 		[self.js dealloc];
 	}
@@ -376,10 +383,10 @@
 
 // Sent if browsing fails
 - (void)netServiceBrowser:(NSNetServiceBrowser *)browser
-			 didNotSearch:(NSDictionary *)errorDict
+			didNotSearch:(NSDictionary *)errorDict
 {
    NSLOG(@"netServiceBrowser didNotSearch %@", [errorDict objectForKey:NSNetServicesErrorCode]);
-	
+
 	//searching = NO;
 	//[self handleError:[errorDict objectForKey:NSNetServicesErrorCode]];
 }
@@ -392,10 +399,10 @@
 
 // Sent when a service appears
 - (void)netServiceBrowser:(NSNetServiceBrowser *)browser
-		   didFindService:(NSNetService *)aNetService
-			   moreComing:(BOOL)moreComing
+		  didFindService:(NSNetService *)aNetService
+			  moreComing:(BOOL)moreComing
 {
-	 
+
 	[self.services addObject:aNetService];
 	[aNetService retain];
 	[aNetService setDelegate:self];
@@ -404,8 +411,8 @@
 
 // Sent when a service disappears
 - (void)netServiceBrowser:(NSNetServiceBrowser *)browser
-		 didRemoveService:(NSNetService *)aNetService
-			   moreComing:(BOOL)moreComing
+		didRemoveService:(NSNetService *)aNetService
+			  moreComing:(BOOL)moreComing
 {
 	[self.services removeObject:aNetService];
 }
@@ -423,7 +430,7 @@
 - (BOOL)application:(UIApplication *)application
 			openURL:(NSURL *)url
   sourceApplication:(NSString *)sourceApplication
-		 annotation:(id)annotation
+		annotation:(id)annotation
 {
 	if (self.pluginManager) {
 		[self.pluginManager handleOpenURL:url  sourceApplication:sourceApplication];
@@ -440,15 +447,17 @@
 		// Dump JS garbage and sound effects immediately
 		[[js_core lastJS] performSelectorOnMainThread:@selector(performGC) withObject:nil waitUntilDone:NO];
 		[[SoundManager get] clearEffects];
-		
+
 		// Allow texture manager to react to a low memory warning as it deems appropriate
-		texture_manager_memory_warning(texture_manager_get());
+		texture_manager_memory_warning();
 	}
 }
 
 - (void) application: (UIApplication *) app didRegisterForRemoteNotificationsWithDeviceToken: (NSData *) deviceToken
 {
-    [self.pluginManager didRegisterForRemoteNotificationsWithDeviceToken:deviceToken application:app];
+	NSLOG(@"{notifications} Push notification registration successful: %@", deviceToken);
+
+	[self.pluginManager didRegisterForRemoteNotificationsWithDeviceToken:deviceToken application:app];
 }
 
 - (void) application: (UIApplication *) app didFailToRegisterForRemoteNotificationsWithError: (NSError *) error
@@ -459,8 +468,12 @@
 }
 
 - (void) application: (UIApplication *) app didReceiveRemoteNotification:(NSDictionary *)userInfo
+	fetchCompletionHandler:(void (^)(UIBackgroundFetchResult result))handler
 {
 	[self.pluginManager didReceiveRemoteNotification:userInfo application:app];
+	if (handler) {
+		handler(UIBackgroundFetchResultNoData);
+	}
 }
 
 - (void)application:(UIApplication *)app didReceiveLocalNotification:(UILocalNotification *)notification
@@ -468,24 +481,31 @@
 	[self.pluginManager didReceiveLocalNotification:notification application:app];
 }
 
+- (void) application: (UIApplication *) application performActionForShortcutItem:(UIApplicationShortcutItem *)shortcutItem completionHandler:(void (^)(BOOL succeeded))completionHandler
+{
+	[self.pluginManager performActionForShortcutItem:shortcutItem];
+	if (completionHandler) {
+		completionHandler(YES);
+	}
+}
 
 //// Splash Screen
 
 - (void) updateScreenProperties {
 	[[UIDevice currentDevice] beginGeneratingDeviceOrientationNotifications];
-	
+
 	// Detect iPad portrait mode
 	UIDeviceOrientation orientation = [[UIDevice currentDevice] orientation];
 
 	if (orientation == UIDeviceOrientationUnknown) {
-		NSLog(@"{core} WARNING: Device orientation unknown");
+		NSLOG(@"{core} WARNING: Device orientation unknown");
 
-		orientation = self.tealeafViewController.interfaceOrientation;
+		orientation = (UIDeviceOrientation)self.tealeafViewController.interfaceOrientation;
 	}
 
 	bool portraitMode = (orientation == UIDeviceOrientationFaceUp ||
-						 orientation == UIDeviceOrientationPortrait ||
-						 orientation == UIDeviceOrientationPortraitUpsideDown);
+						orientation == UIDeviceOrientationPortrait ||
+						orientation == UIDeviceOrientationPortraitUpsideDown);
 
 	if (!self.gameSupportsPortrait) {
 		self.screenPortraitMode = NO;
@@ -518,14 +538,14 @@
 			swap = true;
 		}
 	}
-	
+
 	// Swap orientation if needed
 	if (swap) {
 		int t = w;
 		w = h;
 		h = t;
 	}
-	
+
 	self.initFrame = CGRectMake(0, 0, w, h);
 	w = (int)(w * scale + 0.5f);
 	h = (int)(h * scale + 0.5f);
@@ -536,14 +556,14 @@
 	if (h > longerScreenSide) {
 		longerScreenSide = h;
 	}
-	
+
 	// Store dimensions
 	self.screenWidthPixels = w;
 	self.screenHeightPixels = h;
 	self.screenLongerSide = longerScreenSide;
 	self.screenBestSplash = [self findBestSplash];
 
-	NSLog(@"{core} Device screen (%d, %d), portrait=%d, using splash '%@'", w, h, (int)self.screenPortraitMode, self.screenBestSplash);
+	NSLOG(@"{core} Device screen (%d, %d), portrait=%d, using splash '%@'", w, h, (int)self.screenPortraitMode, self.screenBestSplash);
 }
 
 enum Splashes {
@@ -570,7 +590,7 @@ SplashDescriptor SPLASHES[] = {
 	// Determine longer side
 	const int longerScreenSide = self.screenLongerSide;
 	SplashDescriptor *splash = &SPLASHES[SPLASH_PORTRAIT_480];
-	
+
 	// If on iPad,
 	if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad) {
 		// If portrait mode,
@@ -605,16 +625,16 @@ SplashDescriptor SPLASHES[] = {
 		return @"loading.png";
 	} else {
 		SplashDescriptor *splash = [self findBestSplashDescriptor];
-		
+
 		NSString *splashResource = [NSString stringWithUTF8String:splash->resource];
-		
+
 		return splashResource;
 	}
 }
 
 - (void) selectOrientation {
 	NSArray *supportedOrientations = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"UISupportedInterfaceOrientations"];
-	
+
 	self.gameSupportsLandscape = NO;
 	self.gameSupportsPortrait = NO;
 
@@ -622,7 +642,7 @@ SplashDescriptor SPLASHES[] = {
 	if (supportedOrientations) {
 		for (int ii = 0; ii < [supportedOrientations count]; ++ii) {
 			NSString *orientation = [supportedOrientations objectAtIndex:ii];
-			
+
 			if ([orientation isEqualToString:@"UIInterfaceOrientationPortrait"]) {
 				NSLOG(@"{tealeaf} Game supports portrait mode: %@", orientation);
 				self.gameSupportsPortrait = YES;
@@ -638,38 +658,38 @@ SplashDescriptor SPLASHES[] = {
 			}
 		}
 	}
-	
+
 	// Read manifest file
 	NSError *err = nil;
 	NSString *manifest_file = [[ResourceLoader get] initStringWithContentsOfURL:@"manifest.json"];
 	NSDictionary *dict = nil;
 	NSUInteger length = 0;
 	if (manifest_file) {
-		JSONDecoder *decoder = [JSONDecoder decoderWithParseOptions:JKParseOptionStrict];
-		const char *manifest_utf8 = (const char *) [manifest_file UTF8String];
-		length = strlen(manifest_utf8);
-		dict = [decoder objectWithUTF8String:(const unsigned char *)manifest_utf8 length:length error:&err];
+        dict = [NSJSONSerialization JSONObjectWithData:[manifest_file
+                                                        dataUsingEncoding:NSUTF8StringEncoding]
+                                               options:0
+                                                 error:&err];
 	}
-	
+
 	// If failed to load,
 	if (!dict) {
 		NSLOG(@"{manifest} Invalid JSON formatting: %@ (bytes:%d)", err ? err : @"(no error)", length);
 	} else {
 		self.appManifest = dict;
-		
+
 		NSLOG(@"{manifest} Successfully read manifest file from bundle");
-		
+
 		// If in test-app mode,
 		if (self.isTestApp) {
 			@try {
 				// Look up supported orientations
 				NSArray *orientations = (NSArray *)[dict valueForKey:@"supportedOrientations"];
-				
+
 				// Now that we're getting some info from the manifest, just turn on the ones the game developer wanted
 				self.gameSupportsLandscape = NO;
 				self.gameSupportsPortrait = NO;
-				
-				for (int ii = 0, count = [orientations count]; ii < count; ++ii) {
+
+				for (size_t ii = 0, count = [orientations count]; ii < count; ++ii) {
 					NSString *str = (NSString *)[orientations objectAtIndex:ii];
 					NSLOG(@"{manifest} Read orientation: %@", str);
 					if ([str caseInsensitiveCompare:@"landscape"] == NSOrderedSame) {
@@ -684,7 +704,7 @@ SplashDescriptor SPLASHES[] = {
 			}
 		}
 	}
-	
+
 	// If no orientations supported,
 	if (!self.gameSupportsLandscape &&
 		!self.gameSupportsPortrait) {

@@ -39,6 +39,8 @@
 - (void) handleOpenURL:(NSURL *)url sourceApplication:(NSString *)sourceApplication;
 - (void) onPause;
 - (void) onResume;
+- (void) performActionForShortcutItem: (UIApplicationShortcutItem *) shortcutItem;
+- (void) appLaunchedFromLink:(NSURL *) webURL;
 @end
 
 
@@ -47,6 +49,7 @@
 
 - (void) postNotification:(NSString *)selector obj1:(id)obj1 obj2:(id)obj2;
 - (void) dispatchEvent:(NSString *)name forPlugin:(id)plugin withData:(NSDictionary *)data;
+- (void) dispatchEvent:(NSString *)name forPluginName:(NSString *)pluginName withData:(NSDictionary *)data;
 - (void) dispatchJSEvent:(NSDictionary *)evt;
 - (void) dispatchJSEventWithJSONString: (NSString*) str andRequestId:(NSNumber *)requestId;
 - (void) dispatchJSResponse:(NSDictionary *)response withError:(id)error andRequestId:(NSNumber *)requestId;

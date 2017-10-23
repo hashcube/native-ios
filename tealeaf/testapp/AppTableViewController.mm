@@ -17,7 +17,6 @@
 #include "TeaLeafAppDelegate.h"
 #include "jansson.h"
 #include "jsonUtil.h"
-#import "JSONKit.h"
 #include "log.h"
 #include "iosVersioning.h"
 
@@ -93,7 +92,7 @@ static NSThread *appLoadListThread = nil;
 	[backButton setFrame:backButtonRect];
 	[backButton setTitle:@"Back" forState:UIControlStateNormal];
 	backButton.titleLabel.textColor = [UIColor blackColor];
-	backButton.titleLabel.textAlignment = UITextAlignmentCenter;
+	backButton.titleLabel.textAlignment = (NSTextAlignment)UITextAlignmentCenter;
 	[backButton addTarget:self action:@selector(backButtonFunc) forControlEvents:UIControlEventTouchUpInside];
 
 		
@@ -171,11 +170,11 @@ static NSThread *appLoadListThread = nil;
 	NSString *projectsURL = [NSString stringWithFormat:@"%@/projects", url];
 	NSData *data = [NSData dataWithContentsOfURL:[[NSURL alloc] initWithString:[projectsURL stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]]];
 
-	JSONDecoder *decoder = [JSONDecoder decoderWithParseOptions:JKParseOptionStrict];
-
 	NSError *err;
 	@try {
-		NSDictionary *apps = [decoder objectWithData:data error:&err];
+        NSDictionary *apps = [NSJSONSerialization JSONObjectWithData:data
+                                                             options:0
+                                                               error:&err];
 
 		for (NSString *key in apps) {
 			NSDictionary *app = [apps objectForKey:key];
@@ -368,8 +367,8 @@ static NSThread *appLoadListThread = nil;
 	if (res_obj && json_is_object(res_obj)) {
 		const char *key;
 		json_t *value;
-		__block int obj_count =	 json_object_size(res_obj);
-		__block int cur_obj_index = 0;
+		__block size_t obj_count =	 json_object_size(res_obj);
+		__block size_t cur_obj_index = 0;
 
 		NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
 		NSString *documentsDirectory = [paths objectAtIndex:0];

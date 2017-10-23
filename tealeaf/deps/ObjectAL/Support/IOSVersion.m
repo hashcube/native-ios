@@ -10,6 +10,8 @@
 #import <UIKit/UIKit.h>
 #endif
 
+#import "platform/log.h"
+
 SYNTHESIZE_SINGLETON_FOR_CLASS_PROTOTYPE(IOSVersion);
 
 
@@ -26,13 +28,13 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(IOSVersion);
 		unichar ch = [versionStr characterAtIndex:0];
 		if(ch < '0' || ch > '9' || [versionStr characterAtIndex:1] != '.')
 		{
-			NSLog(@"Error: %s: Cannot parse iOS version string \"%@\"", __PRETTY_FUNCTION__, versionStr);
+			NSLOG(@"Error: %s: Cannot parse iOS version string \"%@\"", __PRETTY_FUNCTION__, versionStr);
 		}
 		
 		version = (float)(ch - '0');
 		
 		float multiplier = 0.1f;
-		unsigned int vLength = [versionStr length];
+		unsigned int vLength = (unsigned)[versionStr length];
 		for(unsigned int i = 2; i < vLength; i++)
 		{
 			ch = [versionStr characterAtIndex:i];

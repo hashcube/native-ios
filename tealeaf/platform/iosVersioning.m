@@ -14,6 +14,7 @@
  */
 
 #import "iosVersioning.h"
+#import "platform/log.h"
 
 #import <mach/mach.h>
 #import <mach/mach_host.h>
@@ -22,39 +23,39 @@
 
 static NSString *m_platform = 0;
 
-CEXPORT int get_platform_memory_limit()
+CEXPORT long get_platform_memory_limit()
 {
-    mach_port_t host_port;
-    mach_msg_type_number_t host_size;
-    vm_size_t pagesize;
+  mach_port_t host_port;
+  mach_msg_type_number_t host_size;
+  vm_size_t pagesize;
 
-    host_port = mach_host_self();
-    host_size = sizeof(vm_statistics_data_t) / sizeof(integer_t);
-    host_page_size(host_port, &pagesize);
-	
-    vm_statistics_data_t vm_stat;
+  host_port = mach_host_self();
+  host_size = sizeof(vm_statistics_data_t) / sizeof(integer_t);
+  host_page_size(host_port, &pagesize);
 
-    if (host_statistics(host_port, HOST_VM_INFO, (host_info_t)&vm_stat, &host_size) != KERN_SUCCESS) {
-        NSLog(@"{core} Failed to fetch vm statistics");
-
-		return 50000000; // Default: 50 MB
-	} else {
-		/* Stats in bytes */
-		natural_t mem_used = (vm_stat.active_count +
-							  vm_stat.inactive_count +
-							  vm_stat.wire_count) * pagesize;
-		natural_t mem_free = vm_stat.free_count * pagesize;
-		natural_t mem_total = mem_used + mem_free;
-
-		NSLog(@"{core} Memory used: %d free: %d total: %d", (int)mem_used, (int)mem_free, (int)mem_total);
-
-		// Return 11.11% of total memory (bytes)
-		int limit = mem_total / 9;
-
-		NSLog(@"{core} Texture memory limit set as low as %d", limit);
-
-		return limit;
-	}
+  vm_statistics_data_t vm_stat;
+  
+  if (host_statistics(host_port, HOST_VM_INFO, (host_info_t)&vm_stat, &host_size) != KERN_SUCCESS) {
+    NSLOG(@"{core} Failed to fetch vm statistics");
+    
+    return 50000000; // Default: 50 MB
+  } else {
+    /* Stats in bytes */
+    long mem_used = (vm_stat.active_count +
+                     vm_stat.inactive_count +
+                     vm_stat.wire_count) * pagesize;
+    long mem_free = vm_stat.free_count * pagesize;
+    long mem_total = mem_used + mem_free;
+    
+    NSLOG(@"{core} Memory used: %ld free: %ld total: %ld", mem_used, mem_free, mem_total);
+    
+    // Return 50% of total memory (bytes)
+    long limit = MIN((mem_total / 2), (200000000));
+    
+    NSLOG(@"{core} Texture memory limit set as low as %d", limit);
+    
+    return limit;
+  }
 }
 
 // Get hw.machine
@@ -71,4 +72,9 @@ CEXPORT NSString *get_platform() {
 
 	// Should return a string like "iPhone4,1".  You can websearch for the other values and what they mean.
     return m_platform;
+}
+
+CEXPORT bool device_is_simulator() {
+    NSString *model = [[UIDevice currentDevice] model];
+    return [model isEqualToString:@"iPhone Simulator"];
 }

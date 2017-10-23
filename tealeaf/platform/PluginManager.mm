@@ -15,7 +15,6 @@
 
 #import "PluginManager.h"
 #include "jsonUtil.h"
-#import <deps/JSONKit.h>
 #import "platform/log.h"
 #include "core.h"
 #include "events.h"
@@ -25,7 +24,6 @@
 #include <stdlib.h>
 
 static js_core *m_core = nil;
-static JSONDecoder *m_decoder = nil;
 static PluginManager *m_pluginManager = nil;
 
 
@@ -33,17 +31,22 @@ JSAG_MEMBER_BEGIN(sendEvent, 3)
 {
 	JSAG_ARG_NSTR(pluginName);
 	JSAG_ARG_NSTR(eventName);
-	JSAG_ARG_CSTR(str);
+	JSAG_ARG_NSTR(str);
 	
 	NSError *err = nil;
-	NSDictionary *json = [m_decoder objectWithUTF8String:(const unsigned char *)str length:(NSUInteger)str_len error:&err];
-	
+	NSDictionary *json = [NSJSONSerialization JSONObjectWithData:[str dataUsingEncoding:NSUTF8StringEncoding]
+                                           options:0
+                                             error:&err];
+
+    
 	if (!json || err) {
 		NSLOG(@"{plugins} WARNING: Event passed to NATIVE.plugins.sendEvent does not contain a valid JSON string.");
 	} else {
 		id returnValue = [m_pluginManager plugin:pluginName name:eventName event:json];
         if ([returnValue isKindOfClass: [NSDictionary class]]) {
-            JSAG_RETURN_NSTR([((NSDictionary *) returnValue) JSONString]);
+            NSData* data = [NSJSONSerialization dataWithJSONObject:returnValue options:0 error:nil];
+            NSString *returnValueString = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+            JSAG_RETURN_NSTR(returnValueString);
         } else {
             JSAG_RETURN_NSTR((NSString *) returnValue);
         }
@@ -56,12 +59,13 @@ JSAG_MEMBER_BEGIN(_sendRequest, 3)
 {
 	JSAG_ARG_NSTR(pluginName);
 	JSAG_ARG_NSTR(eventName);
-	JSAG_ARG_CSTR(str);
+	JSAG_ARG_NSTR(str);
     JSAG_ARG_INT32(id);
 	
 	NSError *err = nil;
-	NSDictionary *json = [m_decoder objectWithUTF8String:(const unsigned char *)str length:(NSUInteger)str_len error:&err];
-	
+    NSDictionary *json = [NSJSONSerialization JSONObjectWithData:[str dataUsingEncoding:NSUTF8StringEncoding]
+                                                         options:0
+                                                           error:&err];
 	if (!json || err) {
 		NSLOG(@"{plugins} WARNING: Event passed to NATIVE.plugins.sendRequest does not contain a valid JSON string.");
 	} else {
@@ -82,9 +86,7 @@ JSAG_OBJECT_END
 
 + (void) addToRuntime:(js_core *)js {
 	m_core = js;
-	
-	m_decoder = [[JSONDecoder decoderWithParseOptions:JKParseOptionStrict] retain];
-	
+    
 	JSAG_OBJECT_ATTACH(js.cx, js.native, plugins);
 }
 
@@ -138,7 +140,7 @@ JSAG_OBJECT_END
 					
 					[self.plugins setObject:pluginInstance forKey:key];
 					
-					NSLog(@"{plugins} Instantiated %s", className);
+					NSLOG(@"{plugins} Instantiated %s", className);
 				}
 			}
 		}
@@ -198,14 +200,27 @@ JSAG_OBJECT_END
 	[self postNotification:@"onResume" obj1:nil obj2:nil];
 }
 
+- (void) performActionForShortcutItem:(UIApplicationShortcutItem *) shortcutItem {
+	[self postNotification:@"performActionForShortcutItem:" obj1:shortcutItem obj2:nil];
+}
+
+- (void) appLaunchedFromLink:(NSURL *) webURL {
+	[self dispatchJSEvent:[NSDictionary dictionaryWithObjectsAndKeys:
+		@"launchedFromLink", @"name",
+		webURL.absoluteString, @"url",
+		webURL.host, @"host",
+		webURL.path, @"path",
+		webURL.query, @"query", nil]];
+}
+
 - (void) dispatchJSEventWithJSONString: (NSString*) str andRequestId:(NSNumber *)requestId {
     if (m_core) {
         JSContext *cx = m_core.cx;
 		dispatch_async(dispatch_get_main_queue(), ^{
             if (m_core) {
-                JS_BeginRequest(cx);
-                jsval evt_val = NSTR_TO_JSVAL(cx, str);
-                [m_core dispatchEvent:&evt_val withRequestId:[requestId intValue]];
+                JSAutoRequest areq(cx);
+                JS::RootedValue evt_val(cx, NSTR_TO_JSVAL(cx, str));
+                [m_core dispatchEvent:evt_val withRequestId:[requestId intValue]];
             }
         });
     } else {
@@ -222,13 +237,23 @@ JSAG_OBJECT_END
                             nil]];
 }
 
+- (void) dispatchEvent:(NSString *)name forPluginName:(NSString *)pluginName withData:(NSDictionary *)data {
+    [self dispatchJSEvent: [NSDictionary dictionaryWithObjectsAndKeys:
+                            @"pluginEvent",@"name",
+                            pluginName,@"pluginName",
+                            name,@"eventName",
+                            data,@"data",
+                            nil]];
+}
+
 - (void) dispatchJSEvent:(NSDictionary *)evt {
-    NSString *evt_nstr = [evt JSONString];
-    [self dispatchJSEventWithJSONString:evt_nstr andRequestId:0];
+    [self dispatchJSEvent:evt withRequestId:0];
 }
 
 - (void) dispatchJSEvent:(NSDictionary *)evt withRequestId:(NSNumber *)requestId {
-    NSString *evt_nstr = [evt JSONString];
+    NSError* error = nil;
+    NSData* data = [NSJSONSerialization dataWithJSONObject:evt options:0 error:&error];
+    NSString *evt_nstr = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
     [self dispatchJSEventWithJSONString:evt_nstr andRequestId:requestId];
 }
 
