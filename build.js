@@ -242,6 +242,20 @@ function updateConfigPlist(app, config, plist) {
     });
 }
 
+function updateStickerPlist(app, config, stickersPlist) {
+  var manifest = app.manifest;
+  var raw = stickersPlist.getRaw();
+  raw.CFBundleDisplayName = manifest.title || "";
+  raw.CFBundleIdentifier = config.bundleID + '.sticker';
+  var version = (manifest.ios && manifest.ios.version) ||
+    manifest.version || '0.0.0';
+  var buildNumber = (manifest.ios && manifest.ios.buildNumber) || version;
+
+  raw.CFBundleShortVersionString = version;
+  // Convert to string
+  raw.CFBundleVersion = buildNumber + "";
+}
+
 function buildXcodeProject(api, app, config) {
   return xcodeUtil
     .getXcodeProject(config.xcodeProjectPath)
@@ -250,13 +264,10 @@ function buildXcodeProject(api, app, config) {
 
       var configPlist = updatePlist.get(path.join(config.xcodeProjectPath, 'resources', 'config.plist'));
       var entitlements = updatePlist.get(path.join(config.xcodeProjectPath, 'TeaLeafIOS.entitlements'));
+      var stickersPlist = updatePlist.getInfoPlist(config.xcodeProjectPath + '/stickers');
       updateInfoPlist(app, config, infoPlist);
       updateConfigPlist(app, config, configPlist);
-
-      var stickersPlist = updatePlist.getInfoPlist(config.xcodeProjectPath + '/stickers');
-      var raw = stickersPlist.getRaw();
-      raw.CFBundleDisplayName = app.manifest.title || "";
-      raw.CFBundleIdentifier = config.bundleID + '.sticker';
+      updateStickerPlist(app, config, stickersPlist);
 
       return Promise
         .resolve(Object.keys(app.modules))
