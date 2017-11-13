@@ -1425,9 +1425,13 @@
 				LastUpgradeCheck = 0610;
 				ORGANIZATIONNAME = "Game Closure";
 				TargetAttributes = {
+					D5BC66E71635D0270059EC0F = {
+						CreatedOnToolsVersion = 9.0;
+						ProvisioningStyle = Manual;
+					};
 					E25AB2611F97557100069969 = {
 						CreatedOnToolsVersion = 9.0;
-						ProvisioningStyle = Automatic;
+						ProvisioningStyle = Manual;
 					};
 				};
 			};
