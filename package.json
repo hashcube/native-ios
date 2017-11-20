@@ -2,7 +2,7 @@
   "author": "The Game Closure DevKit Team",
   "name": "native-ios",
   "description": "Native-iOS DevKit addon for building for the iOS platform",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "dependencies": {
     "bluebird": "^2.9.27",
     "chalk": "^1.0.0",
