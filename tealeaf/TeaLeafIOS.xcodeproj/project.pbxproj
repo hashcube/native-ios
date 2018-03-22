@@ -187,17 +187,8 @@
 		D5BC67861635D0270059EC0F /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1D30AB110D05D00D00671497 /* Foundation.framework */; };
 		D5BC678B1635D0270059EC0F /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5B2BEA6912AEF41100AE98C5 /* CFNetwork.framework */; };
 		D5BC678D1635D0270059EC0F /* libpng.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4EFF545C16165167000C3AFD /* libpng.a */; };
-		E25AB2651F97557200069969 /* Stickers.xcassets in Resources */ = {
-			isa = PBXBuildFile;
-			fileRef = E25AB2641F97557200069969 /* Stickers.xcassets */;
-		};
-		E25AB2691F97557200069969 /* stickers.appex in Embed App Extensions */ = {
-			isa = PBXBuildFile;
-			fileRef = E25AB2621F97557100069969 /* stickers.appex */;
-			settings = {
-				ATTRIBUTES = (RemoveHeadersOnCopy, );
-				};
-			};
+		E25AB2651F97557200069969 /* Stickers.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E25AB2641F97557200069969 /* Stickers.xcassets */; };
+		E25AB2691F97557200069969 /* stickers.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = E25AB2621F97557100069969 /* stickers.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -635,19 +626,8 @@
 		D5CA493A158A4DE30017224F /* js_animate_template.gen.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = js_animate_template.gen.h; sourceTree = "<group>"; };
 		D5E8D6791385C2E200246261 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
 		D5E8D67A1385C2E200246261 /* OpenAL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenAL.framework; path = System/Library/Frameworks/OpenAL.framework; sourceTree = SDKROOT; };
-		E25AB2621F97557100069969 /* stickers.appex */ = {
-			isa = PBXFileReference;
-			explicitFileType = "wrapper.app-extension";
-			includeInIndex = 0;
-			path = stickers.appex;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		E25AB2641F97557200069969 /* Stickers.xcassets */ = {
-			isa = PBXFileReference;
-			lastKnownFileType = folder.assetcatalog;
-			path = Stickers.xcassets;
-			sourceTree = "<group>";
-		};
+		E25AB2621F97557100069969 /* stickers.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = stickers.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		E25AB2641F97557200069969 /* Stickers.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Stickers.xcassets; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -717,6 +697,7 @@
 				29B97323FDCFA39411CA2CEA /* Frameworks */,
 				87742605198C494D0070CAD3 /* Plugins */,
 				19C28FACFE9D520D11CA2CBB /* Products */,
+				BA30762E2063AD7300758BC0 /* Recovered References */,
 			);
 			name = CustomTemplate;
 			sourceTree = "<group>";
@@ -1053,6 +1034,14 @@
 			path = spidermonkey/js;
 			sourceTree = "<group>";
 		};
+		BA30762E2063AD7300758BC0 /* Recovered References */ = {
+			isa = PBXGroup;
+			children = (
+				E25AB2621F97557100069969 /* stickers.appex */,
+			);
+			name = "Recovered References";
+			sourceTree = "<group>";
+		};
 		D551A74A178F345E0028DACC /* uthash */ = {
 			isa = PBXGroup;
 			children = (
@@ -1373,7 +1362,6 @@
 			isa = PBXGroup;
 			children = (
 				E25AB2641F97557200069969 /* Stickers.xcassets */,
-				E25AB2661F97557200069969 /* Info.plist */,
 			);
 			path = stickers;
 			sourceTree = "<group>";
@@ -1390,6 +1378,7 @@
 				D5BC67001635D0270059EC0F /* Sources */,
 				D5BC677A1635D0270059EC0F /* Frameworks */,
 				E25AB26D1F97557200069969 /* Embed App Extensions */,
+				BA30762F2063AD9D00758BC0 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -1427,11 +1416,13 @@
 				TargetAttributes = {
 					D5BC66E71635D0270059EC0F = {
 						CreatedOnToolsVersion = 9.0;
-						ProvisioningStyle = Manual;
+						DevelopmentTeam = CQ9DS8QV5K;
+						ProvisioningStyle = Automatic;
 					};
 					E25AB2611F97557100069969 = {
 						CreatedOnToolsVersion = 9.0;
-						ProvisioningStyle = Manual;
+						DevelopmentTeam = CQ9DS8QV5K;
+						ProvisioningStyle = Automatic;
 					};
 				};
 			};
@@ -1491,6 +1482,19 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		BA30762F2063AD9D00758BC0 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PROJECT_DIR}/extra";
+		};
 		D5295D3617947FF600BEEEE5 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 12;
@@ -1762,9 +1766,11 @@
 				CODE_SIGN_ENTITLEMENTS = TeaLeafIOS.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
 				COMPRESS_PNG_FILES = NO;
 				COPY_PHASE_STRIP = NO;
 				DEAD_CODE_STRIPPING = NO;
+				DEVELOPMENT_TEAM = CQ9DS8QV5K;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GCC_ENABLE_CPP_EXCEPTIONS = NO;
 				GCC_ENABLE_CPP_RTTI = NO;
@@ -1799,6 +1805,7 @@
 				PRODUCT_NAME = TeaLeafIOS;
 				PROVISIONING_PROFILE = "";
 				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				RUN_CLANG_STATIC_ANALYZER = NO;
 				SDKROOT = iphoneos;
 				STRIP_INSTALLED_PRODUCT = NO;
@@ -1821,13 +1828,15 @@
 				CODE_SIGN_ENTITLEMENTS = TeaLeafIOS.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
 				COMPRESS_PNG_FILES = NO;
 				COPY_PHASE_STRIP = YES;
 				DEAD_CODE_STRIPPING = YES;
+				DEVELOPMENT_TEAM = CQ9DS8QV5K;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GCC_ENABLE_CPP_EXCEPTIONS = NO;
 				GCC_ENABLE_CPP_RTTI = NO;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_OPTIMIZATION_LEVEL = 3;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = TeaLeafIOS_Prefix.pch;
@@ -1861,6 +1870,7 @@
 				PRODUCT_NAME = TeaLeafIOS;
 				PROVISIONING_PROFILE = "";
 				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				RUN_CLANG_STATIC_ANALYZER = NO;
 				SDKROOT = iphoneos;
 				STRIP_INSTALLED_PRODUCT = YES;
@@ -1900,6 +1910,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = CQ9DS8QV5K;
 				ENABLE_NS_ASSERTIONS = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -1949,11 +1960,12 @@
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = CQ9DS8QV5K;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
-				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_DYNAMIC_NO_PIC = NO;'
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREPROCESSOR_DEFINITIONS = (
