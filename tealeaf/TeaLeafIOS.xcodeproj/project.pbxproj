@@ -1493,7 +1493,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${PROJECT_DIR}/extra";
+			shellScript = ./resources/extra;
 		};
 		D5295D3617947FF600BEEEE5 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
