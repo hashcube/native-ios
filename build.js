@@ -1,7 +1,6 @@
 var chalk = require('chalk');
 var path = require('path');
 var fs = require('fs-extra');
-var fss = require('fs')
 var updatePlist = require('./lib/updatePlist');
 var xcodeUtil = require('./lib/xcodeUtil');
 var copyResources = require('./lib/copyResources');
@@ -243,16 +242,6 @@ function updateConfigPlist(app, config, plist) {
     });
 }
 
-function addExtrascript(app, path) {
-  try {
-    var extra_script = app.manifest.ios.extra;
-
-    fss.writeFileSync(path, extra_script);
-  } catch (e) {
-    console.error(e);
-    throw new Error('Cannot read ' + path);
-  }
-}
 function updateStickerPlist(app, config, stickersPlist) {
   var manifest = app.manifest;
   var raw = stickersPlist.getRaw();
@@ -276,8 +265,6 @@ function buildXcodeProject(api, app, config) {
       var configPlist = updatePlist.get(path.join(config.xcodeProjectPath, 'resources', 'config.plist'));
       var entitlements = updatePlist.get(path.join(config.xcodeProjectPath, 'TeaLeafIOS.entitlements'));
       var stickersPlist = updatePlist.getInfoPlist(config.xcodeProjectPath + '/stickers');
-      var extrash = path.join(config.xcodeProjectPath, 'resources', 'extra');
-
       updateInfoPlist(app, config, infoPlist);
       updateConfigPlist(app, config, configPlist);
       updateStickerPlist(app, config, stickersPlist);
@@ -324,7 +311,6 @@ function buildXcodeProject(api, app, config) {
             copyResources.copyIcons(api, app, config),
             copyResources.copySplash(api, app, config),
             xcodeProject.installModule(null, {frameworks: DEFAULT_FRAMEWORKS}),
-            addExtrascript(app, extrash),
             xcodeProject.addResourceFiles('resources.bundle')
           ];
         })
