@@ -242,15 +242,32 @@ function updateConfigPlist(app, config, plist) {
     });
 }
 
+function updateStickerPlist(app, config, stickersPlist) {
+  var manifest = app.manifest;
+  var raw = stickersPlist.getRaw();
+  raw.CFBundleDisplayName = manifest.title || "";
+  raw.CFBundleIdentifier = config.bundleID + '.sticker';
+  var version = (manifest.ios && manifest.ios.version) ||
+    manifest.version || '0.0.0';
+  var buildNumber = (manifest.ios && manifest.ios.buildNumber) || version;
+
+  raw.CFBundleShortVersionString = version;
+  // Convert to string
+  raw.CFBundleVersion = buildNumber + "";
+}
+
 function buildXcodeProject(api, app, config) {
   return xcodeUtil
     .getXcodeProject(config.xcodeProjectPath)
     .then(function (xcodeProject) {
       var infoPlist = updatePlist.getInfoPlist(config.xcodeProjectPath);
+
       var configPlist = updatePlist.get(path.join(config.xcodeProjectPath, 'resources', 'config.plist'));
       var entitlements = updatePlist.get(path.join(config.xcodeProjectPath, 'TeaLeafIOS.entitlements'));
+      var stickersPlist = updatePlist.getInfoPlist(config.xcodeProjectPath + '/stickers');
       updateInfoPlist(app, config, infoPlist);
       updateConfigPlist(app, config, configPlist);
+      updateStickerPlist(app, config, stickersPlist);
 
       return Promise
         .resolve(Object.keys(app.modules))
@@ -290,6 +307,7 @@ function buildXcodeProject(api, app, config) {
         })
         .then(function () {
           return [
+            copyResources.copyStickers(api, app, config),
             copyResources.copyIcons(api, app, config),
             copyResources.copySplash(api, app, config),
             xcodeProject.installModule(null, {frameworks: DEFAULT_FRAMEWORKS}),
@@ -303,6 +321,7 @@ function buildXcodeProject(api, app, config) {
             infoPlist.write(),
             configPlist.write(),
             entitlements.write(),
+            stickersPlist.write(),
             executeOnCreate(api, app, config)
           ];
         })
