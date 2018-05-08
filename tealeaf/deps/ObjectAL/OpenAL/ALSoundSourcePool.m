@@ -89,7 +89,9 @@
 {
 	OPTIONALLY_SYNCHRONIZED(self)
 	{
-		[sources addObject:source];
+		if (source !=nil) {
+			[sources addObject:source];
+		}
 	}
 }
 
