@@ -246,11 +246,21 @@ CEXPORT void device_hide_splash() {
 - (void) createGLView {
 	//create our openglview and size it correctly
 	OpenGLView *glView = [[OpenGLView alloc] initWithFrame:self.appDelegate.initFrame];
+	[self.view addSubview:glView];
     
-	self.view = glView;
 	self.appDelegate.canvas = glView;
     
 	core_init_gl(1);
+    
+	glView.translatesAutoresizingMaskIntoConstraints = NO;
+    
+	if (@available(iOS 11.0, *)) {
+		UILayoutGuide * layoutGuide = self.view.safeAreaLayoutGuide;
+		[glView.leadingAnchor constraintEqualToAnchor:layoutGuide.leadingAnchor].active = YES;
+		[glView.trailingAnchor constraintEqualToAnchor:layoutGuide.trailingAnchor].active = YES;
+		[glView.topAnchor constraintEqualToAnchor:layoutGuide.topAnchor].active = YES;
+		[glView.bottomAnchor constraintEqualToAnchor:layoutGuide.bottomAnchor].active = YES;
+	}
     
 	int w = self.appDelegate.screenWidthPixels;
 	int h = self.appDelegate.screenHeightPixels;
